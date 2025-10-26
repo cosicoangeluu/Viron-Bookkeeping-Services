@@ -1,0 +1,74 @@
+.bookkeeper-container {
+  padding: 20px;
+  max-width: 700px;
+  margin: auto;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.client-list {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+}
+
+.client-btn {
+  background: #e5e7eb;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.client-btn.active {
+  background: #3b82f6;
+  color: #fff;
+}
+
+.gross-section {
+  border-top: 2px solid #ddd;
+  margin-top: 15px;
+  padding-top: 10px;
+}
+
+.client-name {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.gross-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.gross-table th,
+.gross-table td {
+  padding: 10px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.gross-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+}
+
+.no-records {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 20px;
+}
+
+.placeholder {
+  text-align: center;
+  color: #6b7280;
+  margin-top: 30px;
+}

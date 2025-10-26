@@ -1,0 +1,144 @@
+.calendar {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 1rem;
+  font-family: "Inter", sans-serif;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-header h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+  color: #4b5563;
+  transition: 0.2s;
+}
+
+.nav-btn:hover {
+  color: #111827;
+}
+
+.calendar-weekdays,
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+}
+
+.calendar-weekdays div {
+  font-weight: 500;
+  padding: 6px 0;
+  color: #374151;
+}
+
+.calendar-grid {
+  gap: 4px;
+}
+
+.calendar-day {
+  padding: 10px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
+  border-radius: 5px;
+  font-size: 0.9rem;
+  transition: 0.2s;
+}
+
+.calendar-day:hover {
+  background: #f3f4f6;
+}
+
+.calendar-day.today {
+  border: 1px solid #3b82f6;
+  font-weight: 600;
+  color: #1d4ed8;
+}
+
+.calendar-day.selected {
+  background: #2563eb;
+  color: #fff;
+  border-color: #2563eb;
+}
+
+.vat-due {
+  background: #fef3c7;
+  border-color: #facc15;
+}
+
+.nonvat-due {
+  background: #dcfce7;
+  border-color: #16a34a;
+}
+
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+  margin-top: 1rem;
+}
+
+.legend-box {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.legend-box.vat {
+  background: #fef3c7;
+  border: 1px solid #facc15;
+}
+
+.legend-box.nonvat {
+  background: #dcfce7;
+  border: 1px solid #16a34a;
+}
+
+.calendar-message {
+  text-align: center;
+  font-size: 0.95rem;
+  margin-top: 1rem;
+  color: #374151;
+  background: #f9fafb;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.due-info {
+  margin-top: 0.4rem;
+  color: #1d4ed8;
+  font-weight: 500;
+}
+
+.no-due {
+  color: #6b7280;
+  margin-top: 0.4rem;
+}
+
+.due-today-alert {
+  margin-top: 1rem;
+  background: #fef9c3;
+  border: 1px solid #facc15;
+  color: #854d0e;
+  padding: 0.8rem;
+  border-radius: 8px;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+}

@@ -1,0 +1,145 @@
+/* ======= General Layout ======= */
+body {
+  font-family: "Inter", "Segoe UI", sans-serif;
+  background-color: #f8fafc;
+  margin: 0;
+  padding: 0;
+}
+
+/* Container */
+.client-gross-container {
+  background: #fff;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 32px;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* Headings */
+.client-gross-container h2 {
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 20px;
+}
+
+/* ======= Form Elements ======= */
+label {
+  display: block;
+  font-weight: 500;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #facc15;
+  box-shadow: 0 0 0 3px rgba(250, 204, 21, 0.3);
+  outline: none;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* ======= Computed Tax Display ======= */
+.tax-box {
+  background: #fefce8;
+  border: 1px solid #facc15;
+  border-radius: 10px;
+  padding: 16px;
+  text-align: center;
+}
+
+.tax-box p {
+  margin: 0;
+  color: #4b5563;
+}
+
+.tax-box h3 {
+  margin: 6px 0 0 0;
+  font-size: 1.5rem;
+  color: #b45309;
+  font-weight: 700;
+}
+
+/* ======= Button ======= */
+button[type="submit"] {
+  background-color: #facc15;
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 10px 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+button[type="submit"]:hover {
+  background-color: #eab308;
+}
+
+button[type="submit"]:active {
+  transform: scale(0.98);
+}
+
+/* ======= Table (History) ======= */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  font-size: 0.9rem;
+}
+
+thead {
+  background-color: #f9fafb;
+}
+
+th,
+td {
+  border: 1px solid #e5e7eb;
+  padding: 10px;
+  text-align: center;
+}
+
+th {
+  font-weight: 600;
+  color: #374151;
+}
+
+td {
+  color: #4b5563;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* ======= Responsive ======= */
+@media (max-width: 640px) {
+  .client-gross-container {
+    padding: 20px;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+
+  h2 {
+    font-size: 1.4rem;
+  }
+}

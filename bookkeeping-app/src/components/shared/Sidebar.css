@@ -1,0 +1,136 @@
+/* Base Sidebar */
+.sidebar {
+  width: 220px;
+  min-height: 100vh;
+  background: #1e293b;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 70px;
+}
+
+/* Header */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem;
+}
+
+.sidebar-title {
+  font-size: 1.5rem;
+  margin-left: 1.5rem;
+}
+
+.collapse-btn {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
+  padding: 0.25rem;
+}
+
+/* Navigation */
+.sidebar-nav {
+  flex-grow: 1;
+}
+
+.sidebar-nav ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.95rem;
+  padding: 0.75rem 1rem;
+  width: 100%;
+  border: none;
+  background: none;
+  color: white;
+  cursor: pointer;
+  font-size: 1.25rem;
+  transition: background 0.2s ease;
+  position: relative;
+}
+
+.sidebar-btn:hover {
+  background: #334155;
+}
+
+.sidebar-btn .icon {
+  width: 20px;
+  height: 20px;
+}
+
+/* Tooltip on hover (when collapsed) */
+.sidebar.collapsed .sidebar-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  left: 70px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: #334155;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 999;
+}
+
+/* Footer */
+.sidebar-footer {
+  padding: 1rem;
+  border-top: 1px solid #334155;
+}
+
+.logout-btn {
+  color: #f87171;
+}
+
+/* Icon in header */
+.logo-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem; /* size of icon */
+  transition: transform 0.2s ease;
+}
+
+.logo-btn:hover {
+  transform: scale(1.1);
+}
+
+/* Active state for sidebar buttons */
+.sidebar-btn.active {
+  background: #cfddf1; /* subtle highlight */
+  font-weight: bold;
+  color: #ffffff;
+  border-left: 4px solid #3b82f6; /* blue accent line */
+}
+
+/* Smooth transition for hover and active states */
+.sidebar-btn,
+.sidebar-btn.active {
+  transition: all 0.2s ease;
+}
+
+/* Keep hover effect consistent */
+.sidebar-btn:hover {
+  background: #88a2c6;
+  color: #f1f5f9;
+}
+

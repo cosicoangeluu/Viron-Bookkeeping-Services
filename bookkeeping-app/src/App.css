@@ -1,0 +1,269 @@
+/* ===== General Reset ===== */
+body,
+html,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Inter', sans-serif;
+  background: #0f172a;
+  color: #f8fafc;
+}
+
+/* ===== Landing Page Background ===== */
+.landing {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem;
+  background: linear-gradient(135deg, #0f172a, #1e293b, #334155);
+  background-size: 300% 300%;
+  animation: bgAnimation 15s ease infinite;
+}
+
+/* Card with glass + floating effect */
+.card.landing-card {
+  background: rgba(30, 41, 59, 0.85);
+  /* dark glass */
+  padding: 2.5rem;
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+  text-align: center;
+  width: 95%;
+  max-width: 440px;
+  animation: floatCard 6s ease-in-out infinite;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #f1f5f9;
+}
+
+/* ===== Titles ===== */
+.title {
+  font-size: 2rem;
+  font-weight: 800;
+  margin-bottom: 0.90rem;
+  color: #3b82f6;
+  animation: fadeIn 1.2s ease forwards;
+}
+
+.subtitle {
+  color: #94a3b8;
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+}
+
+/* ===== Button Group ===== */
+.btn-group {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* ===== Base Button ===== */
+
+
+/* Ripple effect */
+.btn::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.btn:active::after {
+  width: 200%;
+  height: 200%;
+  transition: 0s;
+}
+
+/* ===== Variants ===== */
+.btn.client {
+  padding: 1rem 2.5rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  /* space for icons if needed */
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(148, 163, 184, 0.35);
+}
+
+.btn.bookkeeper {
+  padding: 1rem 2.5rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  /* space for icons if needed */
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #f1f5f9, #d1d5db);
+  color: #111827;
+  box-shadow: 0 4px 12px rgba(100, 116, 139, 0.35);
+}
+
+.btn.login {
+  padding: 1rem 12rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  /* space for icons if needed */
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #2563eb, #1e40af);
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.5);
+  margin-top: 3rem;
+}
+
+.btn.back {
+padding: 0.95rem 12rem;
+  border-radius: 0.9rem;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 5rem;
+  gap: 0.6rem; /* space for icons if needed */
+  transition: all 0.25s ease-in-out;
+  position: relative;
+  overflow: hidden;
+  background: #dcfce7;
+  color: #166534;
+  cursor: pointer;
+}
+
+
+
+/* ===== Hover Effects ===== */
+.btn:hover {
+  transform: translateY(-3px) scale(1.03);
+  filter: brightness(1.1);
+}
+
+.btn.client:hover,
+.btn.bookkeeper:hover {
+  box-shadow: 0 6px 18px rgba(100, 116, 139, 0.5);
+}
+
+.btn.login:hover {
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.65);
+}
+
+.btn.logout:hover {
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.6);
+}
+
+/* ===== Form ===== */
+.form-group {
+  margin-bottom: 1.2rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.input-field {
+  width: 95%;
+  padding: 0.9rem 1rem;
+  border-radius: 0.6rem;
+  border: 1px solid #334155;
+  background: #1e293b;
+  color: #f9fafb;
+  font-size: 1rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.input-field::placeholder {
+  color: #94a3b8;
+}
+
+.input-field:focus {
+  border: 1px solid #2563eb;
+  box-shadow: 0 0 12px rgba(37, 99, 235, 0.7);
+  background: #0f172a;
+}
+
+/* ===== Animations ===== */
+@keyframes floatCard {
+
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes bgAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Dashboard Layout ===== */
+.dashboard-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f9fafb;
+}
+
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  background: #f1f5f9;
+  overflow-y: auto;
+}
