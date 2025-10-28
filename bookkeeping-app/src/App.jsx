@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Briefcase, LogIn, LogOut, Shield, User, UserPlus } from "lucide-react"; // ✅ Added UserPlus
+import { ArrowLeft, BookOpen, Briefcase, LogIn, Shield, User, UserPlus } from "lucide-react"; // ✅ Added UserPlus
 import { useState } from "react";
 import "./App.css";
 import Dashboard from "./components/Dashboard";
@@ -42,6 +42,9 @@ function App() {
     setLoginError("");
     setSignupError("");
   };
+
+  // Expose logout function globally for sidebar
+  window.handleLogout = handleLogout;
 
   // Handle login
   const handleLogin = async (e) => {
@@ -161,9 +164,10 @@ function App() {
         </h1>
         <form onSubmit={handleLogin}>
           <div className="form-group">
+            <label className="form-label">Email</label>
             <input
               type="email"
-              placeholder="Email"
+              placeholder="Enter your email"
               required
               className="input-field"
               value={loginForm.email}
@@ -171,9 +175,10 @@ function App() {
             />
           </div>
           <div className="form-group">
+            <label className="form-label">Password</label>
             <input
               type="password"
-              placeholder="Password"
+              placeholder="Enter your password"
               required
               className="input-field"
               value={loginForm.password}
@@ -284,12 +289,9 @@ function App() {
               clientInfo={currentUser}
               birDueDates={birDueDates}
               clientActivity={clientActivity}
+              setDashboardView={setDashboardView}
             />
-            <div style={{ marginTop: "2rem", textAlign: "center" }}>
-              <button onClick={handleLogout} className="btn logout flex items-center gap-2">
-                <LogOut className="w-5 h-5" /> Logout
-              </button>
-            </div>
+
           </main>
         </div>
       )}

@@ -35,45 +35,13 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
       setLoading(true);
       const response = await fetch(`${API_URL}/personal-info/${clientInfo.id}`);
       const data = await response.json();
-      console.log("📥 Fetched data from backend:", data);
+      console.log("Fetched data from backend:", data);
 
       // Create a clean object with only the fields that have values from the database
       const cleanData = {};
       Object.keys(defaultFormData).forEach(key => {
         if (key === 'dependents') {
-          // Convert dependent birth dates to YYYY-MM-DD format
-          const deps = data[key] || [];
-          cleanData[key] = deps.map(dep => {
-            if (dep.dep_birth_date) {
-              const date = new Date(dep.dep_birth_date);
-              if (!isNaN(date.getTime())) {
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                const day = String(date.getDate()).padStart(2, '0');
-                return { ...dep, dep_birth_date: `${year}-${month}-${day}` };
-              }
-            }
-            return dep;
-          });
-        } else if (key === 'birth_date') {
-          // Convert birth_date from database format to YYYY-MM-DD format for date input
-          if (data[key] && data[key] !== null && data[key] !== undefined) {
-            const date = new Date(data[key]);
-            if (!isNaN(date.getTime())) {
-              // Format as YYYY-MM-DD
-              const year = date.getFullYear();
-              const month = String(date.getMonth() + 1).padStart(2, '0');
-              const day = String(date.getDate()).padStart(2, '0');
-              cleanData[key] = `${year}-${month}-${day}`;
-              console.log(`  ${key}: "${cleanData[key]}" (formatted from ${data[key]})`);
-            } else {
-              cleanData[key] = "";
-              console.log(`  ${key}: "" (invalid date)`);
-            }
-          } else {
-            cleanData[key] = "";
-            console.log(`  ${key}: "" (no date)`);
-          }
+          cleanData[key] = data[key] || [];
         } else {
           // Use the fetched value if it exists and is not null, otherwise use empty string
           const value = (data[key] !== null && data[key] !== undefined) ? data[key] : "";
@@ -82,10 +50,10 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
         }
       });
 
-      console.log("✅ Setting formData to:", cleanData);
+      console.log("Setting formData to:", cleanData);
       setFormData(cleanData);
     } catch (error) {
-      console.error("❌ Error fetching personal info:", error);
+      console.error("Error fetching personal info:", error);
       setFormData(defaultFormData);
     } finally {
       setLoading(false);
@@ -130,44 +98,24 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
     };
     const dbField = keyMap[field] || field;
     updatedDependents[index] = { ...updatedDependents[index], [dbField]: value };
-    const depId = updatedDependents[index].id;
-    console.log(`✏️ Editing dependent ${depId ? `ID ${depId}` : '(new)'} at index ${index}, field: ${dbField}, value: "${value}"`);
-    console.log('   Updated dependent:', updatedDependents[index]);
     setFormData((prev) => ({ ...prev, dependents: updatedDependents }));
   };
 
   const addDependent = () => {
-    console.log('➕ Adding new dependent');
-    setFormData((prev) => {
-      const newDependents = [...(prev.dependents || []), { dep_name: "", dep_birth_date: "", dep_relationship: "" }];
-      console.log('   New dependents array:', newDependents);
-      return { ...prev, dependents: newDependents };
-    });
+    setFormData((prev) => ({
+      ...prev,
+      dependents: [...(prev.dependents || []), { dep_name: "", dep_birth_date: "", dep_relationship: "" }],
+    }));
   };
 
   const removeDependent = (index) => {
     const updatedDependents = [...(formData.dependents || [])];
-    const depToRemove = updatedDependents[index];
-    const depId = depToRemove?.id;
-    console.log(`🗑️ Removing dependent ${depId ? `ID ${depId}` : '(new)'} at index ${index}`);
-    console.log('   Dependent to remove:', depToRemove);
     updatedDependents.splice(index, 1);
-    console.log('   Remaining dependents:', updatedDependents);
     setFormData((prev) => ({ ...prev, dependents: updatedDependents }));
   };
 
   const handleSave = async () => {
     console.log("💾 Saving formData:", formData);
-    console.log("   Number of dependents:", formData.dependents?.length || 0);
-    if (formData.dependents && formData.dependents.length > 0) {
-      console.log("   Dependents being saved:");
-      formData.dependents.forEach((dep, idx) => {
-        console.log(`      [${idx}] ID: ${dep.id || 'NEW'}, Name: "${dep.dep_name}", Birth: "${dep.dep_birth_date}", Rel: "${dep.dep_relationship}"`);
-      });
-    } else {
-      console.log("   ⚠️  No dependents in formData - all should be deleted!");
-    }
-
     try {
       const response = await fetch(`${API_URL}/personal-info/${clientInfo.id}`, {
         method: 'POST',
@@ -176,18 +124,18 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
       });
       if (response.ok) {
         const result = await response.json();
-        console.log("✅ Save successful:", result);
+        console.log("Save successful:", result);
         setIsEditing(false);
         alert('Personal info saved successfully!');
         // Refetch data to ensure consistency
         await fetchPersonalInfo();
       } else {
         const error = await response.json();
-        console.error("❌ Save failed:", error);
+        console.error("Save failed:", error);
         alert('Failed to save personal info');
       }
     } catch (error) {
-      console.error('❌ Error saving personal info:', error);
+      console.error('Error saving personal info:', error);
       alert('Error saving personal info');
     }
   };
@@ -259,7 +207,7 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
             <p className="client-value">—</p>
           ) : (
             (formData.dependents || []).map((dep, index) => (
-              <div key={dep.id || `new-${index}`} className="dependent-item">
+              <div key={index} className="dependent-item">
                 {isEditing ? (
                   <>
                     <input

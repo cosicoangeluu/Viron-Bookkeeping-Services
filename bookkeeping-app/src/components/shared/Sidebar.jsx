@@ -1,20 +1,23 @@
-import React, { useState } from "react";
-import "./Sidebar.css";
 import {
-  Home,
-  FileText,
   BarChart,
-  ClipboardList,
-  User,
   Calendar,
-  Settings,
-  LogOut,
   ChevronLeft,
   ChevronRight,
+  ClipboardList,
+  FileText,
+  Home,
+  LogOut,
+  Settings,
+  User,
+  X
 } from "lucide-react";
+import { useState } from "react";
+import "./Sidebar.css";
 
 const Sidebar = ({ setDashboardView, userType, dashboardView }) => {
   const [collapsed, setCollapsed] = useState(false);
+  const [showLogoutModal, setShowLogoutModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const menuItems = [
     { id: "home", label: "Home", icon: <Home className="icon" /> },
@@ -109,7 +112,70 @@ const Sidebar = ({ setDashboardView, userType, dashboardView }) => {
       </nav>
 
       {/* Footer Logout */}
-      <div className="sidebar-footer"></div>
+      <div className="sidebar-footer">
+        <button
+          onClick={() => setShowLogoutModal(true)}
+          className="sidebar-btn logout-btn"
+          title={collapsed ? "Logout" : ""}
+        >
+          <LogOut className="icon" />
+          {!collapsed && <span>Logout</span>}
+        </button>
+      </div>
+
+      {/* Logout Modal */}
+      {showLogoutModal && (
+        <div className="logout-modal-overlay">
+          <div className="logout-modal">
+            <div className="logout-modal-header">
+              <h3>Confirm Logout</h3>
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="logout-modal-close"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="logout-modal-body">
+              <p>Are you sure you want to logout?</p>
+            </div>
+            <div className="logout-modal-footer">
+              <button
+                onClick={() => setShowLogoutModal(false)}
+                className="btn btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  setShowLogoutModal(false);
+                  setShowSuccessModal(true);
+                  setTimeout(() => {
+                    setShowSuccessModal(false);
+                    window.handleLogout();
+                  }, 1500);
+                }}
+                className="btn btn-danger"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay">
+          <div className="success-modal">
+            <div className="success-modal-body">
+              <div className="success-icon">✓</div>
+              <h3>Logged Out Successfully</h3>
+              <p>You have been logged out of your account.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

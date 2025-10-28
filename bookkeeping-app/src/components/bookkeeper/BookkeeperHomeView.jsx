@@ -1,10 +1,10 @@
-import { CheckCircle, Clock, FileText, MessageSquare, Users } from "lucide-react"; // ✅ icons
+import { ArrowRight, CheckCircle, Clock, Eye, FileText, MessageSquare, Upload, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import "./BookkeeperHomeView.css";
 
 const API_URL = "http://localhost:5000/api";
 
-const BookkeeperHomeView = () => {
+const BookkeeperHomeView = ({ setDashboardView }) => {
   const [stats, setStats] = useState({ total_clients: 0, total_documents: 0, total_messages: 0 });
   const [loading, setLoading] = useState(true);
 
@@ -62,6 +62,30 @@ const BookkeeperHomeView = () => {
           <div className="stat-content">
             <h3>{stats.total_messages}</h3>
             <p>Total Messages</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="quick-actions">
+        <div className="bookkeeper-card card-green">
+          <div className="card-header">
+            <ArrowRight className="icon text-green" />
+            <h3>Quick Actions</h3>
+          </div>
+          <div className="action-buttons">
+            <button className="action-btn" onClick={() => setDashboardView("clientPersonal")}>
+              <Eye className="btn-icon" />
+              View Clients
+            </button>
+            <button className="action-btn" onClick={() => setDashboardView("documents")}>
+              <Upload className="btn-icon" />
+              Upload Document
+            </button>
+            <button className="action-btn" onClick={() => setDashboardView("gross")}>
+              <FileText className="btn-icon" />
+              Generate Report
+            </button>
           </div>
         </div>
       </div>

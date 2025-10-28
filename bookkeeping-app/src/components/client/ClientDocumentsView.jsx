@@ -44,7 +44,10 @@ const ClientDocumentsView = ({ clientInfo }) => {
   if (loading) {
     return (
       <div className="page-container">
-        <div className="loading-message">Loading documents...</div>
+        <div className="loading-message">
+          <div className="loading-spinner"></div>
+          Loading your documents...
+        </div>
       </div>
     );
   }
@@ -52,7 +55,16 @@ const ClientDocumentsView = ({ clientInfo }) => {
   if (error) {
     return (
       <div className="page-container">
-        <div className="error-message">{error}</div>
+        <div className="error-message">
+          <div className="error-icon">⚠️</div>
+          {error}
+          <button
+            className="retry-btn"
+            onClick={fetchDocuments}
+          >
+            Try Again
+          </button>
+        </div>
       </div>
     );
   }

@@ -197,8 +197,9 @@ const BookkeeperDocumentView = () => {
   if (initialLoading) {
     return (
       <div className="page-container">
-        <div style={{ textAlign: 'center', padding: '3rem', color: '#6b7280' }}>
-          Loading...
+        <div className="loading-message">
+          <div className="loading-spinner"></div>
+          Loading clients and documents...
         </div>
       </div>
     );

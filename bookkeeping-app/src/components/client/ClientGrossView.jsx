@@ -10,6 +10,7 @@ const ClientGrossView = ({ clientInfo }) => {
   const grossRef = useRef(null);
   const taxRef = useRef(null);
   const [history, setHistory] = useState([]);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   // Default BIR Forms with tax rates
   const BIR_FORMS = [
@@ -87,7 +88,10 @@ const ClientGrossView = ({ clientInfo }) => {
         monthRef.current.value = "";
         grossRef.current.value = "";
         taxRef.current.textContent = "₱0.00";
-        alert("Record saved successfully!");
+
+        // Show success modal
+        setShowSuccessModal(true);
+        setTimeout(() => setShowSuccessModal(false), 2000);
       } else {
         alert("Failed to save record");
       }
@@ -98,115 +102,99 @@ const ClientGrossView = ({ clientInfo }) => {
   };
 
   return (
-    <div className="p-6 bg-white rounded-2xl shadow-lg max-w-3xl mx-auto">
-      <h2 className="text-2xl font-semibold text-gray-800 mb-4">
-        Gross Income & Tax Computation
-      </h2>
+    <div className="client-gross-container">
+      <h2>Gross Income & Tax Computation</h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Select Form */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Select BIR Form
-          </label>
-          <select
-            ref={formSelectRef}
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring focus:ring-yellow-300"
-          >
-            <option value="">-- Select a BIR Form --</option>
-            {BIR_FORMS.map((form) => (
-              <option key={form.name} value={form.name}>
-                {form.name} ({form.rate * 100}%)
-              </option>
-            ))}
-          </select>
-        </div>
+      <div className="form-section">
+        <form onSubmit={handleSubmit}>
+          {/* Select Form */}
+          <div>
+            <label>Select BIR Form</label>
+            <select ref={formSelectRef}>
+              <option value="">-- Select a BIR Form --</option>
+              {BIR_FORMS.map((form) => (
+                <option key={form.name} value={form.name}>
+                  {form.name} ({form.rate * 100}%)
+                </option>
+              ))}
+            </select>
+          </div>
 
-        {/* Custom Form */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Or Add New Form
-          </label>
-          <input
-            ref={customFormRef}
-            type="text"
-            placeholder="Enter form name"
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring focus:ring-yellow-300"
-          />
-        </div>
+          {/* Custom Form */}
+          <div>
+            <label>Or Add New Form</label>
+            <input
+              ref={customFormRef}
+              type="text"
+              placeholder="Enter form name"
+            />
+          </div>
 
-        {/* Month Covered */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Month Covered
-          </label>
-          <input
-            ref={monthRef}
-            type="month"
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring focus:ring-yellow-300"
-          />
-        </div>
+          {/* Month Covered */}
+          <div>
+            <label>Month Covered</label>
+            <input ref={monthRef} type="month" />
+          </div>
 
-        {/* Gross Income */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-1">
-            Gross Income (₱)
-          </label>
-          <input
-            ref={grossRef}
-            type="number"
-            placeholder="Enter gross income"
-            className="w-full border border-gray-300 rounded-lg p-2 focus:ring focus:ring-yellow-300"
-            onBlur={computeTax}
-          />
-        </div>
+          {/* Gross Income */}
+          <div>
+            <label>Gross Income (₱)</label>
+            <input
+              ref={grossRef}
+              type="number"
+              placeholder="Enter gross income"
+              onBlur={computeTax}
+            />
+          </div>
 
-        {/* Computed Tax */}
-        <div className="bg-yellow-50 p-4 rounded-lg text-center">
-          <p className="text-gray-700">Computed Tax:</p>
-          <h3
-            ref={taxRef}
-            className="text-2xl font-bold text-yellow-700 mt-1"
-          >
-            ₱0.00
-          </h3>
-        </div>
+          {/* Computed Tax */}
+          <div className="tax-box">
+            <p>Computed Tax:</p>
+            <h3 ref={taxRef}>₱0.00</h3>
+          </div>
 
-        {/* Submit */}
-        <button
-          type="submit"
-          className="w-full bg-yellow-500 text-white py-2 rounded-lg font-semibold hover:bg-yellow-600 transition"
-        >
-          Submit
-        </button>
-      </form>
+          {/* Submit */}
+          <button type="submit">Submit</button>
+        </form>
+      </div>
 
       {/* History Table */}
-      <div className="mt-8">
-        <h3 className="text-xl font-semibold text-gray-800 mb-2">
-          Submission History
-        </h3>
-        <table className="w-full border-collapse border border-gray-300 text-sm">
-          <thead className="bg-gray-100">
+      <div className="history-section">
+        <h3>Submission History</h3>
+        <table>
+          <thead>
             <tr>
-              <th className="border p-2">Form</th>
-              <th className="border p-2">Month</th>
-              <th className="border p-2">Gross Income</th>
-              <th className="border p-2">Tax</th>
+              <th>Form</th>
+              <th>Month</th>
+              <th>Gross Income</th>
+              <th>Tax</th>
             </tr>
           </thead>
           <tbody>
             {history.map((record, index) => (
               <tr key={index}>
-                <td className="border p-2">{record.form_name}</td>
-                <td className="border p-2">{record.month}</td>
-                <td className="border p-2">₱{record.gross_income.toLocaleString()}</td>
-                <td className="border p-2 text-yellow-700 font-semibold">₱{record.computed_tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
+                <td>{record.form_name}</td>
+                <td>{record.month}</td>
+                <td>₱{record.gross_income.toLocaleString()}</td>
+                <td>₱{record.computed_tax.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td>
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      {/* Success Modal */}
+      {showSuccessModal && (
+        <div className="success-modal-overlay">
+          <div className="success-modal">
+            <div className="success-modal-body">
+              <CheckCircle className="success-icon" size={60} />
+              <h3>Record Saved Successfully!</h3>
+              <p>Your gross income record has been added to the history.</p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

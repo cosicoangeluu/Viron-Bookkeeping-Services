@@ -16,13 +16,13 @@ import BookkeeperRequestView from "./bookkeeper/BookkeeperRequestView";
 import CalendarView from "./shared/CalendarView";
 import SettingsView from "./shared/SettingsView";
 
-const Dashboard = ({ userType, dashboardView, clientInfo, birDueDates, clientActivity }) => {
+const Dashboard = ({ userType, dashboardView, clientInfo, birDueDates, clientActivity, setDashboardView }) => {
   const renderView = () => {
     switch (dashboardView) {
       case "home":
         return userType === "client"
           ? <ClientHomeView clientInfo={clientInfo} birDueDates={birDueDates} clientActivity={clientActivity}/>
-          : <BookkeeperHomeView />;
+          : <BookkeeperHomeView setDashboardView={setDashboardView} />;
       case "documents":
         return userType === "client" ? <ClientDocumentsView clientInfo={clientInfo} /> : <BookkeeperDocumentsView />;
       case "gross":

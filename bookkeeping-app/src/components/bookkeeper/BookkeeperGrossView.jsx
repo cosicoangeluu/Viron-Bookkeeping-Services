@@ -42,19 +42,21 @@ const BookkeeperGrossView = () => {
 
   return (
     <div className="bookkeeper-container">
-      <h2 className="title">📊 Client Gross Records</h2>
+      <h2 className="title">Client Gross Records</h2>
 
-      {/* Client List */}
-      <div className="client-list">
-        {clients.map((client) => (
-          <button
-            key={client.id}
-            className={`client-btn ${selectedClient && selectedClient.id === client.id ? "active" : ""}`}
-            onClick={() => setSelectedClient(client)}
-          >
-            👤 {client.name}
-          </button>
-        ))}
+      {/* Client Selection */}
+      <div className="client-selection">
+        <div className="client-list">
+          {clients.map((client) => (
+            <button
+              key={client.id}
+              className={`client-btn ${selectedClient && selectedClient.id === client.id ? "active" : ""}`}
+              onClick={() => setSelectedClient(client)}
+            >
+              👤 {client.name}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Gross Records Table */}
