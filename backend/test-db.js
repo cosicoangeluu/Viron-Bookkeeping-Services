@@ -10,22 +10,22 @@ const db = mysql.createConnection({
 
 db.connect((err) => {
   if (err) {
-    console.error('❌ Error connecting to MySQL:', err.message);
-    console.log('\n⚠️  Make sure MySQL is running!');
+    console.error(' Error connecting to MySQL:', err.message);
+    console.log('\n Make sure MySQL is running!');
     process.exit(1);
   }
 
-  console.log('✅ Connected to MySQL database\n');
+  console.log(' Connected to MySQL database\n');
 
   // Check all users
   db.query('SELECT id, name, email, role FROM users', (err, users) => {
     if (err) {
-      console.error('❌ Error fetching users:', err.message);
+      console.error(' Error fetching users:', err.message);
       db.end();
       return;
     }
 
-    console.log('📋 Users in database:');
+    console.log('Users in database:');
     users.forEach(user => {
       console.log(`  - ID: ${user.id}, Name: ${user.name}, Email: ${user.email}, Role: ${user.role}`);
     });
@@ -33,14 +33,14 @@ db.connect((err) => {
     // Check personal info for each user
     db.query('SELECT * FROM personal_info', (err, personalInfo) => {
       if (err) {
-        console.error('❌ Error fetching personal info:', err.message);
+        console.error('Error fetching personal info:', err.message);
         db.end();
         return;
       }
 
-      console.log('\n📝 Personal Info in database:');
+      console.log('\n Personal Info in database:');
       if (personalInfo.length === 0) {
-        console.log('  ⚠️  No personal info records found!');
+        console.log('   No personal info records found!');
       } else {
         personalInfo.forEach(info => {
           console.log(`\n  User ID: ${info.user_id}`);
@@ -59,7 +59,7 @@ db.connect((err) => {
       }
 
       db.end();
-      console.log('\n✅ Database check complete!');
+      console.log('\n Database check complete!');
     });
   });
 });

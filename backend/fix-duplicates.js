@@ -8,7 +8,7 @@ async function fixDuplicates() {
     database: 'viron_bookkeeping_db'
   });
 
-  console.log('✅ Connected to MySQL database\n');
+  console.log('Connected to MySQL database\n');
 
   try {
     // Find all users with duplicate personal_info records
@@ -20,17 +20,17 @@ async function fixDuplicates() {
     `);
 
     if (duplicates.length === 0) {
-      console.log('✅ No duplicates found!');
+      console.log('No duplicates found!');
       await connection.end();
       return;
     }
 
-    console.log(`⚠️  Found ${duplicates.length} user(s) with duplicate records:\n`);
+    console.log(`Found ${duplicates.length} user(s) with duplicate records:\n`);
     duplicates.forEach(dup => {
       console.log(`  User ID ${dup.user_id}: ${dup.count} records`);
     });
 
-    console.log('\n🔧 Fixing duplicates...\n');
+    console.log('\n Fixing duplicates...\n');
 
     for (const dup of duplicates) {
       const userId = dup.user_id;
@@ -41,16 +41,16 @@ async function fixDuplicates() {
         [userId]
       );
 
-      console.log(`\n📝 User ID ${userId} - Found ${records.length} records:`);
+      console.log(`\n User ID ${userId} - Found ${records.length} records:`);
 
       // Keep the newest record (first one)
       const keepRecord = records[0];
-      console.log(`  ✅ Keeping record ID ${keepRecord.id} (newest)`);
+      console.log(`   Keeping record ID ${keepRecord.id} (newest)`);
 
       // Delete older records
       for (let i = 1; i < records.length; i++) {
         const oldRecord = records[i];
-        console.log(`  ❌ Deleting record ID ${oldRecord.id} (old)`);
+        console.log(`   Deleting record ID ${oldRecord.id} (old)`);
 
         // First delete dependents for this old record
         await connection.query(
@@ -66,8 +66,8 @@ async function fixDuplicates() {
       }
     }
 
-    console.log('\n✅ Duplicates cleaned up!');
-    console.log('\n📊 Final check...\n');
+    console.log('\n Duplicates cleaned up!');
+    console.log('\n Final check...\n');
 
     // Verify no more duplicates
     const [finalCheck] = await connection.query(`
@@ -78,16 +78,16 @@ async function fixDuplicates() {
     `);
 
     if (finalCheck.length === 0) {
-      console.log('✅ Success! Each user now has exactly 1 personal_info record.\n');
+      console.log('Success! Each user now has exactly 1 personal_info record.\n');
     } else {
-      console.log('⚠️  Warning: Still found duplicates:\n');
+      console.log(' Warning: Still found duplicates:\n');
       finalCheck.forEach(dup => {
         console.log(`  User ID ${dup.user_id}: ${dup.count} records`);
       });
     }
 
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error(' Error:', error.message);
   } finally {
     await connection.end();
   }
