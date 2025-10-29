@@ -1,3 +1,4 @@
+import { CheckCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import "./ClientGrossView.css";
 

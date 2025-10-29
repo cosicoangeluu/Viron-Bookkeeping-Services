@@ -26,8 +26,11 @@ const ClientHomeView = ({ clientInfo, birDueDates, clientActivity }) => {
       const msgs = await msgsRes.json();
       const gross = await grossRes.json();
 
+      // Calculate total documents across all forms
+      const totalDocuments = Object.values(docs).reduce((total, formDocs) => total + formDocs.length, 0);
+
       setUserStats({
-        documents: Object.keys(docs).length,
+        documents: totalDocuments,
         messages: msgs.length,
         gross_records: gross.length
       });

@@ -21,27 +21,33 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Initialize MySQL Database
-const db = mysql.createConnection({
+// Initialize MySQL Database Connection Pool
+const db = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'viron_bookkeeping_db'
+  database: process.env.DB_NAME || 'viron_bookkeeping_db',
+  connectionLimit: 10,
+  acquireTimeout: 60000,
+  timeout: 60000,
+  reconnect: true
 });
 
-db.connect((err) => {
+// Test initial connection and initialize database
+db.getConnection((err, connection) => {
   if (err) {
     console.error('Error connecting to MySQL database:', err);
     console.log('Please make sure MySQL is running and the database exists.');
     process.exit(1);
   } else {
     console.log('Connected to MySQL database viron_bookkeeping_db');
-    initializeDatabase();
+    initializeDatabase(connection);
+    connection.release();
   }
 });
 
 // Database Schema
-function initializeDatabase() {
+function initializeDatabase(connection) {
   // Users table
   db.query(`
     CREATE TABLE IF NOT EXISTS users (
@@ -222,20 +228,30 @@ const upload = multer({
 // Auth endpoints
 app.post('/api/login', async (req, res) => {
   const { email, password } = req.body;
+  console.log('Login attempt for email:', email);
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password required' });
   }
 
-  db.query('SELECT * FROM users WHERE email = ?', [email], async (err, results) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
-    }
-    if (results.length === 0 || !(await bcrypt.compare(password, results[0].password))) {
+  try {
+    const [results] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+    console.log('Query results length:', results.length);
+    if (results.length === 0) {
+      console.log('No user found for email:', email);
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     const user = results[0];
+    console.log('User found:', user.id, user.email);
+    const isValid = await bcrypt.compare(password, user.password);
+    console.log('Password valid:', isValid);
+    if (!isValid) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
     res.json({ id: user.id, name: user.name, email: user.email, role: user.role });
-  });
+  } catch (error) {
+    console.log('Error in login:', error);
+    return res.status(500).json({ error: 'Server error' });
+  }
 });
 
 app.post('/api/signup', async (req, res) => {
@@ -702,9 +718,9 @@ app.get('/api/documents/:clientId', (req, res) => {
   const { clientId } = req.params;
 
   const query = `
-    SELECT d.id, d.file_name, d.file_path, d.quarter, d.year, d.uploaded_at, f.form_name
+    SELECT d.id, d.file_name, d.file_path, d.quarter, d.year, d.uploaded_at, COALESCE(f.form_name, 'Unknown Form') as form_name
     FROM documents d
-    JOIN bir_forms f ON d.form_id = f.id
+    LEFT JOIN bir_forms f ON d.form_id = f.id
     WHERE d.client_id = ?
     ORDER BY f.form_name, d.year DESC, d.quarter DESC
   `;
@@ -816,7 +832,7 @@ process.on('SIGINT', () => {
     if (err) {
       console.error(err.message);
     }
-    console.log('Database connection closed');
+    console.log('Database connection pool closed');
     process.exit(0);
   });
 });
