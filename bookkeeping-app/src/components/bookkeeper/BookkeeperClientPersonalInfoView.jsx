@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import "./BookkeeperClientPersonalInfoView.css"; // ✅ CSS file
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const BookkeeperClientPersonalView = () => {
   const [clients, setClients] = useState([]);

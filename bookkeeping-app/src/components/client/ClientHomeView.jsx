@@ -2,7 +2,7 @@ import { Bell, Calendar, CheckCircle, Clock, FileText, MessageSquare } from "luc
 import { useEffect, useState } from "react";
 import "./ClientHomeView.css"; // import custom CSS
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const ClientHomeView = ({ clientInfo, birDueDates, clientActivity }) => {
   const [userStats, setUserStats] = useState({ documents: 0, messages: 0, gross_records: 0 });

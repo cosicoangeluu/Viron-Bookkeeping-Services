@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./BookkeeperRequestView.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const BookkeeperRequestView = () => {
   const [selectedClient, setSelectedClient] = useState(null);

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import "./ClientGrossView.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const ClientGrossView = ({ clientInfo }) => {
   const formSelectRef = useRef(null);

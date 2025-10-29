@@ -2,7 +2,7 @@ import { ArrowRight, CheckCircle, Clock, Eye, FileText, MessageSquare, Upload, U
 import { useEffect, useState } from "react";
 import "./BookkeeperHomeView.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const BookkeeperHomeView = ({ setDashboardView }) => {
   const [stats, setStats] = useState({ total_clients: 0, total_documents: 0, total_messages: 0 });

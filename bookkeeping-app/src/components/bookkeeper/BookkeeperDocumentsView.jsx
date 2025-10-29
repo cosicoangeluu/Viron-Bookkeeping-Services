@@ -10,7 +10,7 @@ import {
 import { useEffect, useState } from "react";
 import "./BookkeeperDocumentsView.css";
 
-const API_URL = "http://localhost:5000/api";
+const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 
 const BookkeeperDocumentView = () => {
   const [clients, setClients] = useState([]);
@@ -326,7 +326,7 @@ const BookkeeperDocumentView = () => {
                   </span>
                   <div style={{ marginLeft: "auto", display: "flex", gap: "0.4rem" }}>
                     <a
-                      href={`http://localhost:5000/api/download/${file.id}`}
+                      href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
                       className="download-btn"
                       title="Download file"
                       target="_blank"
@@ -384,7 +384,7 @@ const BookkeeperDocumentView = () => {
                         </span>
                         <div style={{ marginLeft: "auto", display: "flex", gap: "0.4rem" }}>
                           <a
-                            href={`http://localhost:5000/api/download/${file.id}`}
+                            href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
                             className="download-btn"
                             title="Download file"
                             target="_blank"
