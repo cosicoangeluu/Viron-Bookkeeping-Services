@@ -1,6 +1,24 @@
-- [x] Expand BIR_DUE_DATES in CalendarView.jsx with new categories: IncomeTaxIndividuals, IncomeTaxCorporations, WithholdingTaxCompensation, ExpandedWithholdingTax, FinalWithholdingTax, AnnualWithholdingSummary, OtherIncomeTax, including all due dates from the provided table.
-- [x] Update getDueInfo function in CalendarView.jsx to check for the new categories.
-- [x] Update the className logic in the calendar-day button to assign new CSS classes for the new due types.
-- [x] Update the calendar-legend in CalendarView.jsx to include new legend items with appropriate labels.
-- [x] Add new CSS classes in Calendar.css for the new due types (e.g., .income-individual-due, etc.).
-- [x] Add new .legend-box classes in Calendar.css for the new legend items.
+# TODO List for Replacing Alert Messages with Popup Notifications
+
+## Step 1: Implement Notification in ClientPersonalInfoView
+- [ ] Add notification state (type, message, visible) to ClientPersonalInfoView.jsx
+- [ ] Add showNotification function to set and auto-clear notification after 3 seconds
+- [ ] Replace the three alert() calls in handleSave with showNotification calls
+- [ ] Add notification JSX to render the popup in ClientPersonalInfoView.jsx
+- [ ] Add CSS for notification styling in ClientPersonalInfo.css
+
+## Step 2: Create Shared Notification Component
+- [ ] Create src/components/shared/Notification.jsx for reusable notification component
+- [ ] Create src/components/shared/Notification.css for styling
+- [ ] Test the shared component
+
+## Step 3: Replace Alerts in Other Files
+- [ ] Replace alerts in src/components/shared/SettingsView.jsx
+- [ ] Replace alerts in src/components/client/ClientGrossView.jsx
+- [ ] Replace alerts in src/components/bookkeeper/BookkeeperDocumentsView.jsx
+- [ ] Replace alerts in src/App.jsx
+
+## Step 4: Testing and Verification
+- [ ] Test the app to ensure notifications appear and disappear correctly
+- [ ] Verify no console errors
+- [ ] Ensure all alert calls are replaced
