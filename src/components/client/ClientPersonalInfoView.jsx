@@ -214,7 +214,7 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
                 />
               )
             ) : (
-              <p className="client-value">{formData[key] || "—"}</p>
+              <p className="client-value">{key === "birth_date" && formData[key] ? new Date(formData[key]).toLocaleDateString() : formData[key] || "—"}</p>
             )}
           </div>
         ))}
@@ -262,7 +262,7 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
                   </>
                 ) : (
                   <p className="client-value">
-                    {dep.dep_name || "—"} — {dep.dep_birth_date || "—"} ({dep.dep_relationship || "—"})
+                    {dep.dep_name || "—"} — {dep.dep_birth_date ? new Date(dep.dep_birth_date).toLocaleDateString() : "—"} ({dep.dep_relationship || "—"})
                   </p>
                 )}
               </div>
