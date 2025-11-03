@@ -1,9 +1,9 @@
 # TODO List for Replacing Alert Messages with Popup Notifications
 
 ## Step 1: Implement Notification in ClientPersonalInfoView
-- [ ] Add notification state (type, message, visible) to ClientPersonalInfoView.jsx
-- [ ] Add showNotification function to set and auto-clear notification after 3 seconds
-- [ ] Replace the three alert() calls in handleSave with showNotification calls
+- [x] Add notification state (type, message, visible) to ClientPersonalInfoView.jsx
+- [x] Add showNotification function to set and auto-clear notification after 3 seconds
+- [x] Replace the three alert\(\) calls in handleSave with showNotification calls
 - [ ] Add notification JSX to render the popup in ClientPersonalInfoView.jsx
 - [ ] Add CSS for notification styling in ClientPersonalInfo.css
 

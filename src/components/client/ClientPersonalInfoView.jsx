@@ -26,6 +26,7 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
   const [formData, setFormData] = useState(defaultFormData);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [notification, setNotification] = useState({ type: '', message: '', visible: false });
 
   useEffect(() => {
     if (clientInfo.id) {
@@ -127,6 +128,13 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
     setFormData((prev) => ({ ...prev, dependents: updatedDependents }));
   };
 
+  const showNotification = (type, message) => {
+    setNotification({ type, message, visible: true });
+    setTimeout(() => {
+      setNotification({ type: '', message: '', visible: false });
+    }, 3000);
+  };
+
   const handleSave = async () => {
     console.log("💾 Saving formData:", formData);
     try {
@@ -139,17 +147,17 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
         const result = await response.json();
         console.log("Save successful:", result);
         setIsEditing(false);
-        alert('Personal info saved successfully!');
+        showNotification('success', 'Personal info saved successfully!');
         // Refetch data to ensure consistency
         await fetchPersonalInfo();
       } else {
         const error = await response.json();
         console.error("Save failed:", error);
-        alert('Failed to save personal info');
+        showNotification('error', 'Failed to save personal info');
       }
     } catch (error) {
       console.error('Error saving personal info:', error);
-      alert('Error saving personal info');
+      showNotification('error', 'Error saving personal info');
     }
   };
 
@@ -160,6 +168,11 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
 
   return (
     <div className="client-card">
+      {notification.visible && (
+        <div className={`notification ${notification.type}`}>
+          {notification.message}
+        </div>
+      )}
       <div className="client-header">
         <h2>Personal Information</h2>
         {loading && <p>Loading...</p>}
