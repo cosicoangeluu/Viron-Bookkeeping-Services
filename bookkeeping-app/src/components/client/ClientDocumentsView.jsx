@@ -16,7 +16,7 @@ const ClientDocumentsView = ({ clientInfo }) => {
     }
   }, [clientId]);
 
-  const fetchDocuments = async () => {
+  const fetchDocuments = async (retryCount = 0) => {
     setLoading(true);
     setError(null);
     try {
@@ -30,7 +30,13 @@ const ClientDocumentsView = ({ clientInfo }) => {
       setDocuments(data || {});
     } catch (error) {
       console.error("Error fetching documents:", error);
-      setError("Failed to load documents. Please try again later.");
+      if (retryCount < 3) {
+        const delay = Math.pow(2, retryCount) * 1000; // 1s, 2s, 4s
+        console.log(`Retrying in ${delay}ms... (attempt ${retryCount + 1}/3)`);
+        setTimeout(() => fetchDocuments(retryCount + 1), delay);
+        return;
+      }
+      setError("Failed to load documents after multiple attempts. Please try again later.");
       setDocuments({});
     } finally {
       setLoading(false);

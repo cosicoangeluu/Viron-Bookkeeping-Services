@@ -52,29 +52,50 @@
   margin-bottom: 10px;
 }
 
+.no-messages {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 0.95rem;
+  margin-top: 3rem;
+}
+
 .message {
   display: flex;
   flex-direction: column;
   margin-bottom: 10px;
-  max-width: 75%;
-  padding: 10px;
-  border-radius: 10px;
+  width: fit-content;
+  max-width: 70%;
+  word-wrap: break-word;
+  border-radius: 18px;
 }
 
-.message.client {
-  background: #e0f2fe;
-  align-self: flex-start;
+.message.bk-client {
+  margin-right: auto;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
 
-.message.bookkeeper {
-  background: #d1fae5;
-  align-self: flex-end;
+.message.bk-bookkeeper {
+  margin-left: auto;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 .time {
   font-size: 0.75rem;
-  color: #6b7280;
+  opacity: 0.8;
+  margin-top: 4px;
   align-self: flex-end;
+}
+
+.text {
+  font-size: 0.95rem;
 }
 
 .input-section {

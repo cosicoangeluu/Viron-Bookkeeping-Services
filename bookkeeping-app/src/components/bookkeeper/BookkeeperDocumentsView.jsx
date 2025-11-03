@@ -187,8 +187,7 @@ const BookkeeperDocumentView = () => {
       setShowAddFormModal(false);
       alert("Form added successfully!");
     } catch (error) {
-      console.error("Error adding form:", error);
-      alert(error.message);
+      alert("Error adding form: " + error.message);
     }
   };
 

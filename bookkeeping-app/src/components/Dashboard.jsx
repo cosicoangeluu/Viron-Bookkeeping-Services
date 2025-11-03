@@ -6,6 +6,7 @@ import ClientHomeView from "./client/ClientHomeView";
 import ClientPersonalInfoView from "./client/ClientPersonalInfoView";
 import ClientRequestView from "./client/ClientRequestView";
 
+import BookkeeperClientAccountsView from "./bookkeeper/BookkeeperClientAccountsView";
 import BookkeeperClientPersonalInfoView from "./bookkeeper/BookkeeperClientPersonalInfoView";
 import BookkeeperDocumentsView from "./bookkeeper/BookkeeperDocumentsView";
 import BookkeeperGrossView from "./bookkeeper/BookkeeperGrossView";
@@ -16,30 +17,32 @@ import BookkeeperRequestView from "./bookkeeper/BookkeeperRequestView";
 import CalendarView from "./shared/CalendarView";
 import SettingsView from "./shared/SettingsView";
 
-const Dashboard = ({ userType, dashboardView, clientInfo, birDueDates, clientActivity, setDashboardView }) => {
+const Dashboard = ({ userType, dashboardView, userInfo, setDashboardView }) => {
   const renderView = () => {
     switch (dashboardView) {
       case "home":
         return userType === "client"
-          ? <ClientHomeView clientInfo={clientInfo} birDueDates={birDueDates} clientActivity={clientActivity}/>
+          ? <ClientHomeView clientInfo={userInfo}/>
           : <BookkeeperHomeView setDashboardView={setDashboardView} />;
       case "documents":
-        return userType === "client" ? <ClientDocumentsView clientInfo={clientInfo} /> : <BookkeeperDocumentsView />;
+        return userType === "client" ? <ClientDocumentsView clientInfo={userInfo} /> : <BookkeeperDocumentsView />;
       case "gross":
-        return userType === "client" ? <ClientGrossView clientInfo={clientInfo} /> : <BookkeeperGrossView />;
+        return userType === "client" ? <ClientGrossView clientInfo={userInfo} /> : <BookkeeperGrossView />;
       case "request":
-        return userType === "client" ? <ClientRequestView clientInfo={clientInfo} /> : <BookkeeperRequestView />;
+        return userType === "client" ? <ClientRequestView clientInfo={userInfo} /> : <BookkeeperRequestView userInfo={userInfo} />;
       case "personal":
-        return <ClientPersonalInfoView clientInfo={clientInfo} />;
+        return <ClientPersonalInfoView clientInfo={userInfo} />;
       case "clientPersonal":
         return <BookkeeperClientPersonalInfoView />;
+      case "clientAccounts":
+        return <BookkeeperClientAccountsView />;
       case "calendar":
         return <CalendarView />;
       case "settings":
         return <SettingsView />;
       default:
         return userType === "client"
-          ? <ClientHomeView clientInfo={clientInfo} birDueDates={birDueDates} clientActivity={clientActivity}/>
+          ? <ClientHomeView clientInfo={userInfo}/>
           : <BookkeeperHomeView />;
     }
   };

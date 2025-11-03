@@ -1,4 +1,4 @@
-/* ===== General Reset ===== */
+npm/* ===== General Reset ===== */
 body,
 html,
 #root {
@@ -234,6 +234,31 @@ html,
   border: 1px solid #2563eb;
   box-shadow: 0 0 12px rgba(37, 99, 235, 0.7);
   background: #0f172a;
+}
+
+/* ===== Password Input Container ===== */
+.password-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.password-toggle-btn:hover {
+  color: #f1f5f9;
 }
 
 /* ===== Animations ===== */

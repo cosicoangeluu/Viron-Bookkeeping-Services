@@ -84,6 +84,56 @@
   border-color: #16a34a;
 }
 
+.philhealth-due {
+  background: #fed7aa;
+  border-color: #ea580c;
+}
+
+.sss-due {
+  background: #fecaca;
+  border-color: #dc2626;
+}
+
+.pagibig-due {
+  background: #dbeafe;
+  border-color: #3b82f6;
+}
+
+.income-individual-due {
+  background: #f3e8ff;
+  border-color: #a855f7;
+}
+
+.income-corporation-due {
+  background: #fde68a;
+  border-color: #d97706;
+}
+
+.withholding-compensation-due {
+  background: #fed7d3;
+  border-color: #f87171;
+}
+
+.expanded-withholding-due {
+  background: #d1fae5;
+  border-color: #34d399;
+}
+
+.final-withholding-due {
+  background: #a7f3d0;
+  border-color: #10b981;
+}
+
+.annual-withholding-due {
+  background: #ddd6fe;
+  border-color: #8b5cf6;
+}
+
+.other-income-due {
+  background: #fca5a5;
+  border-color: #ef4444;
+}
+
 .calendar-legend {
   display: flex;
   align-items: center;
@@ -91,6 +141,7 @@
   font-size: 0.9rem;
   color: #374151;
   margin-top: 1rem;
+  flex-wrap: wrap;
 }
 
 .legend-box {
@@ -108,6 +159,56 @@
 .legend-box.nonvat {
   background: #dcfce7;
   border: 1px solid #16a34a;
+}
+
+.legend-box.philhealth {
+  background: #fed7aa;
+  border: 1px solid #ea580c;
+}
+
+.legend-box.sss {
+  background: #fecaca;
+  border: 1px solid #dc2626;
+}
+
+.legend-box.pagibig {
+  background: #dbeafe;
+  border: 1px solid #3b82f6;
+}
+
+.legend-box.income-individual {
+  background: #f3e8ff;
+  border: 1px solid #a855f7;
+}
+
+.legend-box.income-corporation {
+  background: #fde68a;
+  border: 1px solid #d97706;
+}
+
+.legend-box.withholding-compensation {
+  background: #fed7d3;
+  border: 1px solid #f87171;
+}
+
+.legend-box.expanded-withholding {
+  background: #d1fae5;
+  border: 1px solid #34d399;
+}
+
+.legend-box.final-withholding {
+  background: #a7f3d0;
+  border: 1px solid #10b981;
+}
+
+.legend-box.annual-withholding {
+  background: #ddd6fe;
+  border: 1px solid #8b5cf6;
+}
+
+.legend-box.other-income {
+  background: #fca5a5;
+  border: 1px solid #ef4444;
 }
 
 .calendar-message {

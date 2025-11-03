@@ -9,6 +9,7 @@ import {
   LogOut,
   Settings,
   User,
+  Users,
   X
 } from "lucide-react";
 import { useState } from "react";
@@ -41,6 +42,11 @@ const Sidebar = ({ setDashboardView, userType, dashboardView }) => {
       id: "clientPersonal",
       label: "Clients Personal Info",
       icon: <User className="icon" />,
+    });
+    menuItems.push({
+      id: "clientAccounts",
+      label: "Client Accounts",
+      icon: <Users className="icon" />,
     });
   }
 

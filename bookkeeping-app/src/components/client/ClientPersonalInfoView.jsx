@@ -16,6 +16,10 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
     phone: "",
     spouse_name: "",
     spouse_tin: "",
+    employment_status: "employed",
+    philhealth_number: "",
+    sss_number: "",
+    pagibig_number: "",
     dependents: []
   };
 
@@ -83,6 +87,15 @@ const ClientPersonalInfoView = ({ clientInfo }) => {
     { key: "phone", label: "Phone Number", type: "tel" },
     { key: "spouse_name", label: "Spouse’s Name (if applicable)", type: "text" },
     { key: "spouse_tin", label: "Spouse’s TIN (if applicable)", type: "text" },
+    {
+      key: "employment_status",
+      label: "Employment Status",
+      type: "select",
+      options: ["employed", "self-employed"],
+    },
+    { key: "philhealth_number", label: "PhilHealth Number", type: "text" },
+    { key: "sss_number", label: "SSS Number", type: "text" },
+    { key: "pagibig_number", label: "Pag-IBIG Number", type: "text" },
   ];
 
   const handleChange = (key, value) => {

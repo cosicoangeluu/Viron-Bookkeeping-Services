@@ -7,9 +7,11 @@ const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
 const BookkeeperHomeView = ({ setDashboardView }) => {
   const [stats, setStats] = useState({ total_clients: 0, total_documents: 0, total_messages: 0 });
   const [loading, setLoading] = useState(true);
+  const [recentActivities, setRecentActivities] = useState([]);
 
   useEffect(() => {
     fetchStats();
+    fetchRecentActivities();
   }, []);
 
   const fetchStats = async () => {
@@ -21,6 +23,42 @@ const BookkeeperHomeView = ({ setDashboardView }) => {
       console.error("Error fetching stats:", error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRecentActivities = async () => {
+    try {
+      // For bookkeeper, show only file upload activities from all clients
+      const response = await fetch(`${API_URL}/users`);
+      const users = await response.json();
+      const clientIds = users.filter(user => user.role === 'client').map(user => user.id);
+
+      const allActivities = [];
+      for (const clientId of clientIds.slice(0, 10)) { // Check more clients for file uploads
+        try {
+          const activityRes = await fetch(`${API_URL}/user-activities/${clientId}`);
+          const activities = await activityRes.json();
+
+          // Filter only file upload activities
+          const uploadActivities = activities.filter(activity =>
+            activity.description.toLowerCase().includes('uploaded') ||
+            activity.description.toLowerCase().includes('document')
+          );
+
+          allActivities.push(...uploadActivities);
+        } catch (err) {
+          console.error(`Error fetching activities for client ${clientId}:`, err);
+        }
+      }
+
+      // Sort by timestamp and take top 10 most recent file uploads
+      const sortedActivities = allActivities
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 10);
+
+      setRecentActivities(sortedActivities.map(activity => activity.description));
+    } catch (error) {
+      console.error("Error fetching recent activities:", error);
     }
   };
 
@@ -112,9 +150,17 @@ const BookkeeperHomeView = ({ setDashboardView }) => {
             <h3>Recent Activity</h3>
           </div>
           <ul className="bookkeeper-list">
-            <li>Processed client documents</li>
-            <li>Sent filing reminders</li>
-            <li>Updated client records</li>
+            {recentActivities.length > 0 ? (
+              recentActivities.map((activity, index) => (
+                <li key={index}>{activity}</li>
+              ))
+            ) : (
+              <>
+                <li>Processed client documents</li>
+                <li>Sent filing reminders</li>
+                <li>Updated client records</li>
+              </>
+            )}
           </ul>
         </div>
       </div>

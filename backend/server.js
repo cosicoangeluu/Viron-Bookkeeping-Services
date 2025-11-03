@@ -20,21 +20,26 @@ if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
 
-// Initialize MySQL Database
-const db = mysql.createConnection({
+// Initialize MySQL Database Pool
+const db = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'viron_bookkeeping_db'
+  database: process.env.DB_NAME || 'viron_bookkeeping_db',
+  connectionLimit: 10, // Maximum number of connections in the pool
+  acquireTimeoutMillis: 60000, // Timeout for acquiring a connection
+  connectTimeout: 60000 // Connection timeout
 });
 
-db.connect((err) => {
+// Test the connection pool
+db.getConnection((err, connection) => {
   if (err) {
     console.error('Error connecting to MySQL database:', err);
     console.log('Please make sure MySQL is running and the database exists.');
     process.exit(1);
   } else {
     console.log('Connected to MySQL database viron_bookkeeping_db');
+    connection.release(); // Release the test connection back to the pool
     initializeDatabase();
   }
 });
@@ -47,12 +52,32 @@ function initializeDatabase() {
       id INT AUTO_INCREMENT PRIMARY KEY,
       email VARCHAR(255) UNIQUE NOT NULL,
       password VARCHAR(255) NOT NULL,
+      plain_password VARCHAR(255),
       role ENUM('client', 'bookkeeper') NOT NULL,
       name VARCHAR(255) NOT NULL,
+      reset_token VARCHAR(255),
+      reset_expires DATETIME,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     )
   `, (err) => {
     if (err) console.error('Error creating users table:', err);
+  });
+
+  // Add plain_password column if it doesn't exist
+  db.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS plain_password VARCHAR(255)
+  `, (err) => {
+    if (err) console.error('Error adding plain_password column:', err);
+  });
+
+  // Add reset_token and reset_expires columns if they don't exist (for existing tables)
+  db.query(`
+    ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS reset_token VARCHAR(255),
+    ADD COLUMN IF NOT EXISTS reset_expires DATETIME
+  `, (err) => {
+    if (err) console.error('Error adding reset columns to users table:', err);
   });
 
   // Personal info table
@@ -71,11 +96,26 @@ function initializeDatabase() {
       phone VARCHAR(20),
       spouse_name VARCHAR(255),
       spouse_tin VARCHAR(50),
+      employment_status ENUM('employed', 'self-employed') DEFAULT 'employed',
+      philhealth_number VARCHAR(20),
+      sss_number VARCHAR(20),
+      pagibig_number VARCHAR(20),
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
     )
   `, (err) => {
     if (err) console.error('Error creating personal_info table:', err);
+  });
+
+  // Add new columns if they don't exist
+  db.query(`
+    ALTER TABLE personal_info
+    ADD COLUMN IF NOT EXISTS employment_status ENUM('employed', 'self-employed') DEFAULT 'employed',
+    ADD COLUMN IF NOT EXISTS philhealth_number VARCHAR(20),
+    ADD COLUMN IF NOT EXISTS sss_number VARCHAR(20),
+    ADD COLUMN IF NOT EXISTS pagibig_number VARCHAR(20)
+  `, (err) => {
+    if (err) console.error('Error adding new columns to personal_info table:', err);
   });
 
   // Dependents table
@@ -135,6 +175,32 @@ function initializeDatabase() {
     if (err) console.error('Error creating home_stats table:', err);
   });
 
+  // Reminders table
+  db.query(`
+    CREATE TABLE IF NOT EXISTS reminders (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      date VARCHAR(50) NOT NULL,
+      description TEXT NOT NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+  `, (err) => {
+    if (err) console.error('Error creating reminders table:', err);
+  });
+
+  // User activities table
+  db.query(`
+    CREATE TABLE IF NOT EXISTS user_activities (
+      id INT AUTO_INCREMENT PRIMARY KEY,
+      user_id INT NOT NULL,
+      activity_type VARCHAR(50) NOT NULL,
+      description TEXT NOT NULL,
+      timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `, (err) => {
+    if (err) console.error('Error creating user_activities table:', err);
+  });
+
   // Legacy clients table (for backward compatibility)
   db.query(`
     CREATE TABLE IF NOT EXISTS clients (
@@ -162,14 +228,14 @@ function initializeDatabase() {
   db.query(`
     CREATE TABLE IF NOT EXISTS documents (
       id INT AUTO_INCREMENT PRIMARY KEY,
-      client_id INT NOT NULL,
+      user_id INT NOT NULL,
       form_id INT NOT NULL,
       file_name VARCHAR(255) NOT NULL,
       file_path VARCHAR(255) NOT NULL,
       quarter VARCHAR(10) NOT NULL,
       year INT NOT NULL,
       uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (client_id) REFERENCES users(id) ON DELETE CASCADE,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
       FOREIGN KEY (form_id) REFERENCES bir_forms(id) ON DELETE CASCADE
     )
   `, (err) => {
@@ -194,6 +260,23 @@ function initializeDatabase() {
       [formName],
       (err) => {
         if (err) console.error(`Error inserting BIR form ${formName}:`, err);
+      }
+    );
+  });
+
+  // Insert default reminders if they don't exist
+  const defaultReminders = [
+    { date: 'Oct 20, 2025', description: 'Quarterly VAT Return' },
+    { date: 'Nov 10, 2025', description: 'Monthly Percentage Tax' },
+    { date: 'Dec 31, 2025', description: 'Annual Income Tax Return' }
+  ];
+
+  defaultReminders.forEach(reminder => {
+    db.query(
+      'INSERT IGNORE INTO reminders (date, description) VALUES (?, ?)',
+      [reminder.date, reminder.description],
+      (err) => {
+        if (err) console.error(`Error inserting reminder ${reminder.description}:`, err);
       }
     );
   });
@@ -237,6 +320,69 @@ app.post('/api/login', async (req, res) => {
   });
 });
 
+app.post('/api/forgot-password', (req, res) => {
+  const { email } = req.body;
+  if (!email) {
+    return res.status(400).json({ error: 'Email is required' });
+  }
+
+  // Generate a unique reset token
+  const resetToken = require('crypto').randomBytes(32).toString('hex');
+  const resetExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour from now
+
+  db.query(
+    'UPDATE users SET reset_token = ?, reset_expires = ? WHERE email = ?',
+    [resetToken, resetExpires, email],
+    (err, result) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (result.affectedRows === 0) {
+        return res.status(404).json({ error: 'Email not found' });
+      }
+      // In a real app, send email with token. For now, return the token for demo.
+      res.json({ message: 'Reset token generated', resetToken });
+    }
+  );
+});
+
+app.post('/api/reset-password', async (req, res) => {
+  const { token, newPassword, confirmPassword } = req.body;
+  if (!token || !newPassword || !confirmPassword) {
+    return res.status(400).json({ error: 'Token, new password, and confirm password are required' });
+  }
+  if (newPassword !== confirmPassword) {
+    return res.status(400).json({ error: 'Passwords do not match' });
+  }
+
+  db.query(
+    'SELECT * FROM users WHERE reset_token = ? AND reset_expires > NOW()',
+    [token],
+    async (err, results) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (results.length === 0) {
+        return res.status(400).json({ error: 'Invalid or expired token' });
+      }
+
+      const user = results[0];
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+      db.query(
+        'UPDATE users SET password = ?, plain_password = ?, reset_token = NULL, reset_expires = NULL WHERE id = ?',
+        [hashedPassword, newPassword, user.id],
+        (err) => {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+          res.json({ message: 'Password reset successfully' });
+        }
+      );
+    }
+  );
+});
+
 app.post('/api/signup', async (req, res) => {
   const { email, password, role, name } = req.body;
   if (!email || !password || !role || !name) {
@@ -246,8 +392,8 @@ app.post('/api/signup', async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
     db.query(
-      'INSERT INTO users (email, password, role, name) VALUES (?, ?, ?, ?)',
-      [email, hashedPassword, role, name],
+      'INSERT INTO users (email, password, plain_password, role, name) VALUES (?, ?, ?, ?, ?)',
+      [email, hashedPassword, password, role, name],
       (err, result) => {
         if (err) {
           if (err.code === 'ER_DUP_ENTRY') {
@@ -307,13 +453,17 @@ app.post('/api/personal-info/:userId', (req, res) => {
     address: personalData.address || null,
     phone: personalData.phone || null,
     spouse_name: personalData.spouse_name || null,
-    spouse_tin: personalData.spouse_tin || null
+    spouse_tin: personalData.spouse_tin || null,
+    employment_status: personalData.employment_status || 'employed',
+    philhealth_number: personalData.philhealth_number || null,
+    sss_number: personalData.sss_number || null,
+    pagibig_number: personalData.pagibig_number || null
   };
 
   const query = `
     INSERT INTO personal_info
-      (user_id, full_name, tin, birth_date, birth_place, citizenship, civil_status, gender, address, phone, spouse_name, spouse_tin, updated_at)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+      (user_id, full_name, tin, birth_date, birth_place, citizenship, civil_status, gender, address, phone, spouse_name, spouse_tin, employment_status, philhealth_number, sss_number, pagibig_number, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
     ON DUPLICATE KEY UPDATE
       full_name = VALUES(full_name),
       tin = VALUES(tin),
@@ -326,6 +476,10 @@ app.post('/api/personal-info/:userId', (req, res) => {
       phone = VALUES(phone),
       spouse_name = VALUES(spouse_name),
       spouse_tin = VALUES(spouse_tin),
+      employment_status = VALUES(employment_status),
+      philhealth_number = VALUES(philhealth_number),
+      sss_number = VALUES(sss_number),
+      pagibig_number = VALUES(pagibig_number),
       updated_at = CURRENT_TIMESTAMP
   `;
 
@@ -341,7 +495,11 @@ app.post('/api/personal-info/:userId', (req, res) => {
     cleanData.address,
     cleanData.phone,
     cleanData.spouse_name,
-    cleanData.spouse_tin
+    cleanData.spouse_tin,
+    cleanData.employment_status,
+    cleanData.philhealth_number,
+    cleanData.sss_number,
+    cleanData.pagibig_number
   ];
 
   db.query(query, params, (err, result) => {
@@ -472,6 +630,16 @@ app.post('/api/gross-records/:userId', (req, res) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
+
+      // Log activity
+      db.query(
+        'INSERT INTO user_activities (user_id, activity_type, description) VALUES (?, ?, ?)',
+        [userId, 'gross_record', `Added gross record for ${form_name} - ${month}`],
+        (err) => {
+          if (err) console.error('Error logging activity:', err);
+        }
+      );
+
       res.json({ id: result.insertId });
     }
   );
@@ -504,6 +672,16 @@ app.post('/api/messages', (req, res) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
+
+      // Log activity for sender
+      db.query(
+        'INSERT INTO user_activities (user_id, activity_type, description) VALUES (?, ?, ?)',
+        [sender_id, 'message_sent', `Sent a message`],
+        (err) => {
+          if (err) console.error('Error logging activity:', err);
+        }
+      );
+
       res.json({ id: result.insertId });
     }
   );
@@ -523,6 +701,27 @@ app.get('/api/home-stats', (req, res) => {
   });
 });
 
+// Reminders endpoint
+app.get('/api/reminders', (req, res) => {
+  db.query('SELECT * FROM reminders ORDER BY date ASC', [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+// User activities endpoint
+app.get('/api/user-activities/:userId', (req, res) => {
+  const { userId } = req.params;
+  db.query('SELECT * FROM user_activities WHERE user_id = ? ORDER BY timestamp DESC LIMIT 10', [userId], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
 // Get all clients (for bookkeeper)
 app.get('/api/clients', (req, res) => {
   db.query("SELECT id, name, email FROM users WHERE role = 'client' ORDER BY name", [], (err, rows) => {
@@ -536,6 +735,16 @@ app.get('/api/clients', (req, res) => {
 // Get all users (for admin/bookkeeper views)
 app.get('/api/users', (req, res) => {
   db.query('SELECT id, name, email, role FROM users ORDER BY name', [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    res.json(rows);
+  });
+});
+
+// Get client accounts with passwords (for bookkeeper management)
+app.get('/api/client-accounts', (req, res) => {
+  db.query('SELECT id, name, email, plain_password FROM users WHERE role = ? ORDER BY name', ['client'], (err, rows) => {
     if (err) {
       return res.status(500).json({ error: err.message });
     }
@@ -600,7 +809,7 @@ app.post('/api/upload', upload.array('files'), (req, res) => {
       let processed = 0;
       req.files.forEach((file) => {
         db.query(
-          `INSERT INTO documents (client_id, form_id, file_name, file_path, quarter, year)
+          `INSERT INTO documents (user_id, form_id, file_name, file_path, quarter, year)
            VALUES (?, ?, ?, ?, ?, ?)`,
           [client_id, form_id, file.originalname, file.filename, quarter, year],
           (err, result) => {
@@ -614,6 +823,15 @@ app.post('/api/upload', upload.array('files'), (req, res) => {
                 quarter,
                 year
               });
+
+              // Log activity
+              db.query(
+                'INSERT INTO user_activities (user_id, activity_type, description) VALUES (?, ?, ?)',
+                [client_id, 'document_upload', `Uploaded ${file.originalname} for ${form_name}`],
+                (err) => {
+                  if (err) console.error('Error logging activity:', err);
+                }
+              );
             }
 
             processed++;
@@ -635,7 +853,7 @@ app.get('/api/documents/:clientId/:formName', (req, res) => {
     SELECT d.id, d.file_name, d.file_path, d.quarter, d.year, d.uploaded_at
     FROM documents d
     JOIN bir_forms f ON d.form_id = f.id
-    WHERE d.client_id = ? AND f.form_name = ?
+    WHERE d.user_id = ? AND f.form_name = ?
     ORDER BY d.year DESC, d.quarter DESC
   `;
 
@@ -663,7 +881,7 @@ app.get('/api/documents', (req, res) => {
     SELECT d.id, d.file_name, d.file_path, d.quarter, d.year, d.uploaded_at, f.form_name, u.name as client_name
     FROM documents d
     JOIN bir_forms f ON d.form_id = f.id
-    JOIN users u ON d.client_id = u.id
+    JOIN users u ON d.user_id = u.id
     ORDER BY u.name, f.form_name, d.year DESC, d.quarter DESC
   `;
 
@@ -704,7 +922,7 @@ app.get('/api/documents/:clientId', (req, res) => {
     SELECT d.id, d.file_name, d.file_path, d.quarter, d.year, d.uploaded_at, f.form_name
     FROM documents d
     JOIN bir_forms f ON d.form_id = f.id
-    WHERE d.client_id = ?
+    WHERE d.user_id = ?
     ORDER BY f.form_name, d.year DESC, d.quarter DESC
   `;
 
@@ -730,6 +948,129 @@ app.get('/api/documents/:clientId', (req, res) => {
     });
 
     res.json(documentsByForm);
+  });
+});
+
+
+
+// Calculate due dates for government contributions
+app.get('/api/due-dates/:userId', (req, res) => {
+  const { userId } = req.params;
+
+  // Get user's personal info including employment status and membership numbers
+  db.query('SELECT employment_status, philhealth_number, sss_number, pagibig_number FROM personal_info WHERE user_id = ?', [userId], (err, results) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    if (results.length === 0) {
+      return res.json({ dueDates: [] });
+    }
+
+    const userInfo = results[0];
+    const dueDates = [];
+    const now = new Date();
+    const currentMonth = now.getMonth() + 1; // JavaScript months are 0-indexed
+    const currentYear = now.getFullYear();
+
+    // Helper function to get last day of month
+    const getLastDayOfMonth = (year, month) => {
+      return new Date(year, month, 0).getDate();
+    };
+
+    // Helper function to get first day of next quarter
+    const getFirstDayOfNextQuarter = (year, month) => {
+      const quarter = Math.ceil(month / 3);
+      const nextQuarter = quarter === 4 ? 1 : quarter + 1;
+      const nextYear = quarter === 4 ? year + 1 : year;
+      const firstMonthOfQuarter = (nextQuarter - 1) * 3 + 1;
+      return { year: nextYear, month: firstMonthOfQuarter, day: 1 };
+    };
+
+    // PhilHealth due dates
+    if (userInfo.philhealth_number) {
+      if (userInfo.employment_status === 'employed') {
+        // For employed: 15th or 20th of next month based on last digit of PhilHealth number
+        const lastDigit = parseInt(userInfo.philhealth_number.slice(-1));
+        const dueDay = lastDigit >= 1 && lastDigit <= 5 ? 15 : 20;
+        const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        const dueYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+
+        dueDates.push({
+          agency: 'PhilHealth',
+          description: `PhilHealth contribution payment (Employed) - Form PMRF, ER2`,
+          dueDate: `${dueYear}-${String(nextMonth).padStart(2, '0')}-${String(dueDay).padStart(2, '0')}`,
+          membershipNumber: userInfo.philhealth_number
+        });
+      } else if (userInfo.employment_status === 'self-employed') {
+        // For self-employed: last day of current month or quarter
+        const lastDay = getLastDayOfMonth(currentYear, currentMonth);
+        dueDates.push({
+          agency: 'PhilHealth',
+          description: `PhilHealth contribution payment (Self-employed) - Form PMRF, PPP5`,
+          dueDate: `${currentYear}-${String(currentMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`,
+          membershipNumber: userInfo.philhealth_number
+        });
+      }
+    }
+
+    // SSS due dates
+    if (userInfo.sss_number) {
+      // Both employed and self-employed: last day of next month
+      const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+      const dueYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+      const lastDay = getLastDayOfMonth(dueYear, nextMonth);
+
+      const forms = userInfo.employment_status === 'employed'
+        ? 'Form R-1, R-1A, R-3'
+        : 'Form RS-1, RS-5';
+
+      dueDates.push({
+        agency: 'SSS',
+        description: `SSS contribution payment (${userInfo.employment_status === 'employed' ? 'Employed' : 'Self-employed'}) - ${forms}`,
+        dueDate: `${dueYear}-${String(nextMonth).padStart(2, '0')}-${String(lastDay).padStart(2, '0')}`,
+        membershipNumber: userInfo.sss_number
+      });
+    }
+
+    // Pag-IBIG due dates
+    if (userInfo.pagibig_number) {
+      if (userInfo.employment_status === 'employed' || userInfo.employment_status === 'self-employed') {
+        // For both: 10th of next month, or optionally first month of next quarter for self-employed
+        const nextMonth = currentMonth === 12 ? 1 : currentMonth + 1;
+        const dueYear = currentMonth === 12 ? currentYear + 1 : currentYear;
+
+        const forms = userInfo.employment_status === 'employed'
+          ? 'Form ER1, MDF, MRS'
+          : 'Form MDF, POF';
+
+        dueDates.push({
+          agency: 'Pag-IBIG',
+          description: `Pag-IBIG contribution payment (${userInfo.employment_status === 'employed' ? 'Employed' : 'Self-employed'}) - ${forms}`,
+          dueDate: `${dueYear}-${String(nextMonth).padStart(2, '0')}-10`,
+          membershipNumber: userInfo.pagibig_number
+        });
+
+        // Optional quarterly payment for self-employed
+        if (userInfo.employment_status === 'self-employed') {
+          const nextQuarter = getFirstDayOfNextQuarter(currentYear, currentMonth);
+          dueDates.push({
+            agency: 'Pag-IBIG',
+            description: `Pag-IBIG contribution payment (Quarterly Option) - Form MDF, POF`,
+            dueDate: `${nextQuarter.year}-${String(nextQuarter.month).padStart(2, '0')}-${String(nextQuarter.day).padStart(2, '0')}`,
+            membershipNumber: userInfo.pagibig_number
+          });
+        }
+      }
+    }
+
+    // Filter for current month and future due dates only
+    const currentMonthDueDates = dueDates.filter(dueDate => {
+      const dueDateObj = new Date(dueDate.dueDate);
+      return dueDateObj >= now;
+    });
+
+    res.json({ dueDates: currentMonthDueDates });
   });
 });
 
@@ -815,7 +1156,7 @@ process.on('SIGINT', () => {
     if (err) {
       console.error(err.message);
     }
-    console.log('Database connection closed');
+    console.log('Database connection pool closed');
     process.exit(0);
   });
 });

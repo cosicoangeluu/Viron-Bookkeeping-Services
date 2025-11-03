@@ -17,6 +17,30 @@
   margin-bottom: 1rem;
 }
 
+.bookkeeper-selector {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+.bookkeeper-selector label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #374151;
+}
+
+.bookkeeper-selector select {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  background: white;
+  font-size: 1rem;
+}
+
 .message-box {
   border: 1px solid #e5e7eb;
   border-radius: 8px;
@@ -38,17 +62,30 @@
   display: flex;
   flex-direction: column;
   margin-bottom: 0.8rem;
-  max-width: 80%;
+  width: fit-content;
+  max-width: 70%;
   word-wrap: break-word;
 }
 
 .message.client {
-  align-self: flex-end;
-  background: #dbeafe;
-  color: #1e40af;
-  border-radius: 12px 12px 0 12px;
-  padding: 8px 12px;
+  margin-left: auto;
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  color: #ffffff;
+  border-radius: 18px 18px 4px 18px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
 }
+
+.message.bookkeeper {
+  margin-right: auto;
+  background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+  color: #374151;
+  border-radius: 18px 18px 18px 4px;
+  padding: 10px 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
 
 .text {
   font-size: 0.95rem;
@@ -56,8 +93,8 @@
 
 .time {
   font-size: 0.75rem;
-  color: #6b7280;
-  margin-top: 2px;
+  opacity: 0.8;
+  margin-top: 4px;
   align-self: flex-end;
 }
 
