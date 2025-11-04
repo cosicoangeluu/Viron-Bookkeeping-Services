@@ -133,7 +133,8 @@
   color: #475569;
 }
 
-/* ===== Download Button ===== */
+/* ===== View and Download Buttons ===== */
+.view-btn,
 .download-btn {
   display: flex;
   align-items: center;
@@ -147,11 +148,11 @@
   transition: all 0.3s ease;
   text-decoration: none;
   color: #334155;
-  margin-left: auto;
   font-weight: 500;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+.view-btn:hover,
 .download-btn:hover {
   background: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
   transform: translateY(-1px);
@@ -159,6 +160,7 @@
   border-color: #94a3b8;
 }
 
+.view-btn svg,
 .download-btn svg {
   width: 16px;
   height: 16px;

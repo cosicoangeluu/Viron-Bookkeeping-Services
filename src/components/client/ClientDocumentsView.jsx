@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight, Download, Paperclip } from "lucide-react";
+import { ChevronDown, ChevronRight, Download, Eye, Paperclip, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const API_URL = "https://bookkeeping-backend-pewk.onrender.com/api";
@@ -9,6 +9,7 @@ const ClientDocumentsView = ({ clientInfo }) => {
   const [expandedForm, setExpandedForm] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [viewingDocument, setViewingDocument] = useState(null);
 
   useEffect(() => {
     if (clientId) {
@@ -108,6 +109,13 @@ const ClientDocumentsView = ({ clientInfo }) => {
                             {file.fileName} ({file.quarter}, {file.year})
                           </span>
                           <div style={{ marginLeft: "auto", display: "flex", gap: "0.4rem" }}>
+                            <button
+                              className="view-btn"
+                              title="View file"
+                              onClick={() => setViewingDocument(file)}
+                            >
+                              <Eye size={14} />
+                            </button>
                             <a
                               href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
                               className="download-btn"
@@ -137,6 +145,31 @@ const ClientDocumentsView = ({ clientInfo }) => {
           </div>
         )}
       </div>
+
+      {viewingDocument && (
+        <div className="modal-overlay" onClick={() => setViewingDocument(null)}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>{viewingDocument.fileName}</h3>
+              <button
+                className="close-btn"
+                onClick={() => setViewingDocument(null)}
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="modal-body">
+              <iframe
+                src={`https://bookkeeping-backend-pewk.onrender.com/api/download/${viewingDocument.id}`}
+                width="100%"
+                height="600px"
+                style={{ border: 'none' }}
+                title={`View ${viewingDocument.fileName}`}
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

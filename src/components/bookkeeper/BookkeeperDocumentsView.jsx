@@ -25,6 +25,8 @@ const BookkeeperDocumentView = () => {
   const [newFormName, setNewFormName] = useState("");
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMessage, setNotificationMessage] = useState("");
 
   // Fetch clients on mount
   useEffect(() => {
@@ -127,7 +129,8 @@ const BookkeeperDocumentView = () => {
 
       await fetchDocuments();
       await fetchAllClientDocuments();
-      alert("Files uploaded successfully!");
+      setNotificationMessage("Files uploaded successfully!");
+      setShowNotification(true);
 
       // Reset form
       document.getElementById("file-input").value = "";
@@ -408,32 +411,56 @@ const BookkeeperDocumentView = () => {
       {showAddFormModal && (
         <div className="modal-overlay">
           <div className="modal-content">
-            <h3>Add New BIR Form</h3>
-            <input
-              type="text"
-              placeholder="Enter form name (e.g., BIR Form 1234)"
-              value={newFormName}
-              onChange={(e) => setNewFormName(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter') {
-                  handleAddForm();
-                }
-              }}
-              autoFocus
-            />
-            <div className="modal-actions">
-              <button className="modal-add-btn" onClick={handleAddForm}>
-                Add
-              </button>
-              <button
-                className="modal-cancel-btn"
-                onClick={() => {
-                  setShowAddFormModal(false);
-                  setNewFormName("");
+            <div className="modal-header">
+              <h3>Add New BIR Form</h3>
+            </div>
+            <div className="modal-body">
+              <input
+                type="text"
+                placeholder="Enter form name (e.g., BIR Form 1234)"
+                value={newFormName}
+                onChange={(e) => setNewFormName(e.target.value)}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    handleAddForm();
+                  }
                 }}
+                autoFocus
+              />
+              <div className="modal-actions">
+                <button className="modal-add-btn" onClick={handleAddForm}>
+                  Add
+                </button>
+                <button
+                  className="modal-cancel-btn"
+                  onClick={() => {
+                    setShowAddFormModal(false);
+                    setNewFormName("");
+                  }}
+                >
+                  <X size={14} /> Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Notification Popup */}
+      {showNotification && (
+        <div className="modal-overlay" onClick={() => setShowNotification(false)}>
+          <div className="modal-content notification-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Success</h3>
+              <button
+                className="close-btn"
+                onClick={() => setShowNotification(false)}
               >
-                <X size={14} /> Cancel
+                <X size={20} />
               </button>
+            </div>
+            <div className="modal-body">
+              <p>{notificationMessage}</p>
             </div>
           </div>
         </div>
