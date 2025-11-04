@@ -103,7 +103,7 @@ const BookkeeperClientPersonalView = () => {
                     {personalInfo.dependents.map((dep) => (
                       <tr key={dep.id || `${dep.dep_name}-${dep.dep_birth_date}`}>
                         <td>{dep.dep_name || '—'}</td>
-                        <td>{dep.dep_birth_date || '—'}</td>
+                        <td>{dep.dep_birth_date ? new Date(dep.dep_birth_date).toISOString().split('T')[0] : '—'}</td>
                         <td>{dep.dep_relationship || '—'}</td>
                       </tr>
                     ))}

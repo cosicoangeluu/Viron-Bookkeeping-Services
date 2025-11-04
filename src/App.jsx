@@ -327,24 +327,42 @@ function App() {
             />
           </div>
           <div className="form-group">
-            <input
-              type="password"
-              placeholder="Password"
-              required
-              className="input-field"
-              value={signupForm.password}
-              onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                required
+                className="input-field"
+                value={signupForm.password}
+                onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <div className="form-group">
-            <input
-              type="password"
-              placeholder="Re-enter Password"
-              required
-              className="input-field"
-              value={signupForm.confirmPassword}
-              onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Re-enter Password"
+                required
+                className="input-field"
+                value={signupForm.confirmPassword}
+                onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           {signupError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{signupError}</div>}
           <button type="submit" className="btn login flex items-center gap-5" disabled={isLoading}>
@@ -422,25 +440,43 @@ function App() {
           </div>
           <div className="form-group">
             <label className="form-label">New Password</label>
-            <input
-              type="password"
-              placeholder="Enter new password"
-              required
-              className="input-field"
-              value={resetForm.newPassword}
-              onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Enter new password"
+                required
+                className="input-field"
+                value={resetForm.newPassword}
+                onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <div className="form-group">
             <label className="form-label">Confirm New Password</label>
-            <input
-              type="password"
-              placeholder="Confirm new password"
-              required
-              className="input-field"
-              value={resetForm.confirmPassword}
-              onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
-            />
+            <div className="password-input-container">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Confirm new password"
+                required
+                className="input-field"
+                value={resetForm.confirmPassword}
+                onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           {resetError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{resetError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
