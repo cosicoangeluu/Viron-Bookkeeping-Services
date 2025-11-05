@@ -165,17 +165,100 @@ html,
 
 /* Card with glass effect for forms */
 .card.landing-card {
-  background: rgba(30, 41, 59, 0.9);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  background: rgba(30, 41, 59, 0.95);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  padding: 2.5rem 2rem;
+  border-radius: 1.25rem;
+  box-shadow:
+    0 15px 35px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
   text-align: center;
-  width: 95%;
-  max-width: 420px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  width: 100%;
+  max-width: 450px;
+  border: 1px solid rgba(139, 92, 246, 0.15);
   color: #f1f5f9;
+  position: relative;
+  overflow: hidden;
+}
+
+.card.landing-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  transition: left 0.8s ease;
+}
+
+.card.landing-card:hover::before {
+  left: 100%;
+}
+
+/* Form layout inside the card */
+.card.landing-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.card.landing-card .form-group {
+  margin-bottom: 1.25rem;
+  text-align: left;
+}
+
+.card.landing-card .form-group:last-child {
+  margin-bottom: 0;
+}
+
+.card.landing-card .button-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  justify-content: space-between;
+}
+
+.card.landing-card .button-group .btn {
+  flex: 1;
+  min-width: 0;
+}
+
+.card.landing-card .password-input-container {
+  position: relative;
+}
+
+.card.landing-card .password-input-container .input-field {
+  padding-right: 3.5rem;
+}
+
+.card.landing-card .password-toggle-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: #94a3b8;
+  cursor: pointer;
+  padding: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+  font-size: 1.2rem;
+  z-index: 2;
+}
+
+.card.landing-card .password-toggle-btn:hover {
+  color: #e2e8f0;
+}
+
+.card.landing-card .error-message {
+  margin-top: 1rem;
+  margin-bottom: 0;
 }
 
 /* ===== Titles ===== */
@@ -210,12 +293,13 @@ html,
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 0;
 }
 
 .button-group .btn {
   flex: 1;
   width: auto;
+  margin-top: 0 !important;
 }
 
 /* ===== Base Button ===== */
@@ -758,6 +842,15 @@ html,
   .btn.back {
     padding: 0.9rem 1.5rem;
     font-size: 0.9rem;
+  }
+
+  .button-group {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .button-group .btn {
+    width: 100%;
   }
 }
 
