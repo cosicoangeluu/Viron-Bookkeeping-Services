@@ -1,4 +1,4 @@
-import { ArrowLeft, BookOpen, Briefcase, LogIn, Shield, User, UserPlus } from "lucide-react"; // ✅ Added UserPlus, Eye, EyeOff
+import { ArrowLeft, BookOpen, Briefcase, Eye, EyeOff, Loader2, Lock, LogIn, Mail, Shield, User, UserPlus } from "lucide-react";
 import { useState } from "react";
 import "./App.css";
 import Dashboard from "./components/Dashboard";
@@ -199,30 +199,40 @@ function App() {
   const renderLanding = () => (
     <div className="landing">
       <div className="card landing-card">
-        <BookOpen className="w-12 h-12 text-blue-600" />
-        <h1 className="title flex items-center gap-2">
+        <div className="landing-header-icon">
+          <BookOpen className="w-16 h-16 text-blue-500" />
+        </div>
+        <h1 className="title">
           VIRON BOOKKEEPING SERVICES
         </h1>
-        <p className="subtitle">Please select your role to continue</p>
-        <div className="btn-group">
-          <button
+        <p className="subtitle">Choose your role to get started</p>
+        <div className="role-selection-cards">
+          <div
             onClick={() => {
               setUserType("client");
               setView("login");
             }}
-            className="btn client flex items-center gap-2"
+            className="role-card client-role"
           >
-            <User className="w-5 h-5" /> I’m a Client
-          </button>
-          <button
+            <div className="role-icon">
+              <User className="w-8 h-8" />
+            </div>
+            <h3 className="role-card-title">I'm a Client</h3>
+            <p className="role-card-description">Access your financial records and manage your bookkeeping</p>
+          </div>
+          <div
             onClick={() => {
               setUserType("bookkeeper");
               setView("login");
             }}
-            className="btn bookkeeper flex items-center gap-2"
+            className="role-card bookkeeper-role"
           >
-            <Briefcase className="w-5 h-5" /> I’m a Bookkeeper
-          </button>
+            <div className="role-icon">
+              <Briefcase className="w-8 h-8" />
+            </div>
+            <h3 className="role-card-title">I'm a Bookkeeper</h3>
+            <p className="role-card-description">Manage client accounts and provide professional services</p>
+          </div>
         </div>
       </div>
     </div>
@@ -238,7 +248,10 @@ function App() {
         </h1>
         <form onSubmit={handleLogin}>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Email
+            </label>
             <input
               type="email"
               placeholder="Enter your email"
@@ -249,26 +262,32 @@ function App() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">Password</label>
-            <input
-              type={showPasswordLogin ? "text" : "password"}
-              placeholder="Enter your password"
-              required
-              className="input-field password-input"
-              value={loginForm.password}
-              onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-            />
-            <button
-              type="button"
-              className="password-toggle-btn"
-              onClick={() => setShowPasswordLogin(!showPasswordLogin)}
-            >
-              {showPasswordLogin ? "Hide" : "Show"}
-            </button>
+            <label className="form-label flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Password
+            </label>
+            <div className="password-input-container">
+              <input
+                type={showPasswordLogin ? "text" : "password"}
+                placeholder="Enter your password"
+                required
+                className="input-field"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPasswordLogin(!showPasswordLogin)}
+              >
+                {showPasswordLogin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
-          {loginError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{loginError}</div>}
+          {loginError && <div className="error-message">{loginError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
-            <LogIn className="w-5 h-5" /> {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isLoading ? 'Logging in...' : 'Login'}
           </button>
           <button
             type="button"
@@ -298,84 +317,141 @@ function App() {
     </div>
   );
 
+  // Helper function to calculate password strength
+  const getPasswordStrength = (password) => {
+    if (!password) return { strength: 0, label: '', color: '' };
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+    if (/\d/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+
+    if (strength <= 2) return { strength: 1, label: 'Weak', color: '#ef4444' };
+    if (strength <= 3) return { strength: 2, label: 'Fair', color: '#f59e0b' };
+    if (strength <= 4) return { strength: 3, label: 'Good', color: '#10b981' };
+    return { strength: 4, label: 'Strong', color: '#10b981' };
+  };
+
   // Signup Page
-  const renderSignup = () => (
-    <div className="landing">
-      <div className="card landing-card">
-        <h1 className="title flex items-center gap-2">
-          <UserPlus className="w-6 h-6 text-gray-700" />
-          {userType === "client" ? "Create Client Account" : "Create Bookkeeper Account"}
-        </h1>
-        <form onSubmit={handleSignup}>
-          <div className="form-group">
-            <input
-              type="text"
-              placeholder="Full Name"
-              required
-              className="input-field"
-              value={signupForm.name}
-              onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type="email"
-              placeholder="Email"
-              required
-              className="input-field"
-              value={signupForm.email}
-              onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
-            />
-          </div>
-          <div className="form-group">
-            <input
-              type={showPasswordSignup ? "text" : "password"}
-              placeholder="Password"
-              required
-              className="input-field password-input"
-              value={signupForm.password}
-              onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
-            />
+  const renderSignup = () => {
+    const passwordStrength = getPasswordStrength(signupForm.password);
+
+    return (
+      <div className="landing">
+        <div className="card landing-card">
+          <h1 className="title flex items-center gap-2">
+            <UserPlus className="w-6 h-6 text-gray-700" />
+            {userType === "client" ? "Create Client Account" : "Create Bookkeeper Account"}
+          </h1>
+          <form onSubmit={handleSignup}>
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2">
+                <User className="w-4 h-4" />
+                Full Name
+              </label>
+              <input
+                type="text"
+                placeholder="Enter your full name"
+                required
+                className="input-field"
+                value={signupForm.name}
+                onChange={(e) => setSignupForm({ ...signupForm, name: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2">
+                <Mail className="w-4 h-4" />
+                Email
+              </label>
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+                className="input-field"
+                value={signupForm.email}
+                onChange={(e) => setSignupForm({ ...signupForm, email: e.target.value })}
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Password
+              </label>
+              <div className="password-input-container">
+                <input
+                  type={showPasswordSignup ? "text" : "password"}
+                  placeholder="Create a password"
+                  required
+                  className="input-field"
+                  value={signupForm.password}
+                  onChange={(e) => setSignupForm({ ...signupForm, password: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPasswordSignup(!showPasswordSignup)}
+                >
+                  {showPasswordSignup ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+              {signupForm.password && (
+                <div className="password-strength">
+                  <div className="password-strength-bar">
+                    <div
+                      className="password-strength-fill"
+                      style={{
+                        width: `${(passwordStrength.strength / 4) * 100}%`,
+                        backgroundColor: passwordStrength.color
+                      }}
+                    ></div>
+                  </div>
+                  <span className="password-strength-label" style={{ color: passwordStrength.color }}>
+                    {passwordStrength.label}
+                  </span>
+                </div>
+              )}
+            </div>
+            <div className="form-group">
+              <label className="form-label flex items-center gap-2">
+                <Lock className="w-4 h-4" />
+                Confirm Password
+              </label>
+              <div className="password-input-container">
+                <input
+                  type={showPasswordSignup ? "text" : "password"}
+                  placeholder="Re-enter your password"
+                  required
+                  className="input-field"
+                  value={signupForm.confirmPassword}
+                  onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
+                />
+                <button
+                  type="button"
+                  className="password-toggle-btn"
+                  onClick={() => setShowPasswordSignup(!showPasswordSignup)}
+                >
+                  {showPasswordSignup ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
+            </div>
+            {signupError && <div className="error-message">{signupError}</div>}
+            <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
+              {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
+              {isLoading ? 'Creating Account...' : 'Create Account'}
+            </button>
             <button
               type="button"
-              className="password-toggle-btn"
-              onClick={() => setShowPasswordSignup(!showPasswordSignup)}
+              onClick={() => setView("login")}
+              className="btn back flex items-center gap-2"
             >
-              {showPasswordSignup ? "Hide" : "Show"}
+              <ArrowLeft className="w-5 h-5" /> Back to Login
             </button>
-          </div>
-          <div className="form-group">
-            <input
-              type={showPasswordSignup ? "text" : "password"}
-              placeholder="Re-enter Password"
-              required
-              className="input-field password-input"
-              value={signupForm.confirmPassword}
-              onChange={(e) => setSignupForm({ ...signupForm, confirmPassword: e.target.value })}
-            />
-            <button
-              type="button"
-              className="password-toggle-btn"
-              onClick={() => setShowPasswordSignup(!showPasswordSignup)}
-            >
-              {showPasswordSignup ? "Hide" : "Show"}
-            </button>
-          </div>
-          {signupError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{signupError}</div>}
-          <button type="submit" className="btn login flex items-center gap-5" disabled={isLoading}>
-            <UserPlus className="w-9 h-5" /> {isLoading ? 'Creating Account...' : 'Create Account'}
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("login")}
-            className="btn back flex items-center gap-2"
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Login
-          </button>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Forgot Password Page
   const renderForgotPassword = () => (
@@ -388,7 +464,10 @@ function App() {
         <p className="subtitle">Enter your email to receive a password reset token</p>
         <form onSubmit={handleForgotPassword}>
           <div className="form-group">
-            <label className="form-label">Email</label>
+            <label className="form-label flex items-center gap-2">
+              <Mail className="w-4 h-4" />
+              Email
+            </label>
             <input
               type="email"
               placeholder="Enter your email"
@@ -398,9 +477,10 @@ function App() {
               onChange={(e) => setForgotForm({ ...forgotForm, email: e.target.value })}
             />
           </div>
-          {forgotError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{forgotError}</div>}
+          {forgotError && <div className="error-message">{forgotError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
-            <LogIn className="w-5 h-5" /> {isLoading ? 'Sending...' : 'Send Reset Token'}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isLoading ? 'Sending...' : 'Send Reset Token'}
           </button>
           <button
             type="button"
@@ -425,7 +505,10 @@ function App() {
         <p className="subtitle">Enter the reset token and your new password</p>
         <form onSubmit={handleResetPassword}>
           <div className="form-group">
-            <label className="form-label">Reset Token</label>
+            <label className="form-label flex items-center gap-2">
+              <Shield className="w-4 h-4" />
+              Reset Token
+            </label>
             <input
               type="text"
               placeholder="Enter reset token"
@@ -436,44 +519,55 @@ function App() {
             />
           </div>
           <div className="form-group">
-            <label className="form-label">New Password</label>
-            <input
-              type={showPasswordReset ? "text" : "password"}
-              placeholder="Enter new password"
-              required
-              className="input-field password-input"
-              value={resetForm.newPassword}
-              onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
-            />
-            <button
-              type="button"
-              className="password-toggle-btn"
-              onClick={() => setShowPasswordReset(!showPasswordReset)}
-            >
-              {showPasswordReset ? "Hide" : "Show"}
-            </button>
+            <label className="form-label flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              New Password
+            </label>
+            <div className="password-input-container">
+              <input
+                type={showPasswordReset ? "text" : "password"}
+                placeholder="Enter new password"
+                required
+                className="input-field"
+                value={resetForm.newPassword}
+                onChange={(e) => setResetForm({ ...resetForm, newPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPasswordReset(!showPasswordReset)}
+              >
+                {showPasswordReset ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
           <div className="form-group">
-            <label className="form-label">Confirm New Password</label>
-            <input
-              type={showPasswordReset ? "text" : "password"}
-              placeholder="Confirm new password"
-              required
-              className="input-field password-input"
-              value={resetForm.confirmPassword}
-              onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
-            />
-            <button
-              type="button"
-              className="password-toggle-btn"
-              onClick={() => setShowPasswordReset(!showPasswordReset)}
-            >
-              {showPasswordReset ? "Hide" : "Show"}
-            </button>
+            <label className="form-label flex items-center gap-2">
+              <Lock className="w-4 h-4" />
+              Confirm New Password
+            </label>
+            <div className="password-input-container">
+              <input
+                type={showPasswordReset ? "text" : "password"}
+                placeholder="Confirm new password"
+                required
+                className="input-field"
+                value={resetForm.confirmPassword}
+                onChange={(e) => setResetForm({ ...resetForm, confirmPassword: e.target.value })}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPasswordReset(!showPasswordReset)}
+              >
+                {showPasswordReset ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+              </button>
+            </div>
           </div>
-          {resetError && <div className="error-message" style={{ color: 'red', marginBottom: '1rem' }}>{resetError}</div>}
+          {resetError && <div className="error-message">{resetError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
-            <LogIn className="w-5 h-5" /> {isLoading ? 'Resetting...' : 'Reset Password'}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isLoading ? 'Resetting...' : 'Reset Password'}
           </button>
           <button
             type="button"
