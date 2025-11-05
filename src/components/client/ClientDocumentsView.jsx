@@ -117,11 +117,10 @@ const ClientDocumentsView = ({ clientInfo }) => {
                               <Eye size={14} />
                             </button>
                             <a
-                              href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
+                              href={`${API_URL}/download/${file.id}`}
                               className="download-btn"
                               title="Download file"
-                              target="_blank"
-                              rel="noopener noreferrer"
+                              download={file.fileName}
                             >
                               <Download size={14} />
                             </a>
@@ -151,21 +150,45 @@ const ClientDocumentsView = ({ clientInfo }) => {
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <div className="modal-header">
               <h3>{viewingDocument.fileName}</h3>
-              <button
-                className="close-btn"
-                onClick={() => setViewingDocument(null)}
-              >
-                <X size={20} />
-              </button>
+              <div style={{ marginLeft: "auto", display: "flex", gap: "0.5rem" }}>
+                <a
+                  href={`${API_URL}/download/${viewingDocument.id}`}
+                  className="download-btn"
+                  title="Download file"
+                  download={viewingDocument.fileName}
+                  style={{ textDecoration: "none", padding: "0.5rem" }}
+                >
+                  <Download size={16} />
+                </a>
+                <button
+                  className="close-btn"
+                  onClick={() => setViewingDocument(null)}
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
             <div className="modal-body">
               <iframe
-                src={`https://bookkeeping-backend-pewk.onrender.com/api/download/${viewingDocument.id}`}
+                src={`${API_URL}/download/${viewingDocument.id}?inline=true`}
                 width="100%"
                 height="600px"
-                style={{ border: 'none' }}
+                style={{ border: 'none', borderRadius: '0.5rem' }}
                 title={`View ${viewingDocument.fileName}`}
+                onError={(e) => {
+                  console.error('Error loading document:', e);
+                }}
               />
+              <div style={{
+                marginTop: '1rem',
+                padding: '0.75rem',
+                background: '#f3f4f6',
+                borderRadius: '0.5rem',
+                fontSize: '0.875rem',
+                color: '#6b7280'
+              }}>
+                <strong>Note:</strong> If the document doesn't display above, click the download button to save it to your device.
+              </div>
             </div>
           </div>
         </div>

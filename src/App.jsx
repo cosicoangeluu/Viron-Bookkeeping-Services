@@ -304,21 +304,22 @@ function App() {
             {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
           <div className="divider">OR</div>
-          <button
-            type="button"
-            onClick={() => setView("signup")}
-            className="btn back flex items-center gap-2"
-            style={{ marginTop: 0 }}
-          >
-            <UserPlus className="w-5 h-5" /> Create New Account
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("landing")}
-            className="btn back flex items-center gap-2"
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Home
-          </button>
+          <div className="button-group">
+            <button
+              type="button"
+              onClick={() => setView("signup")}
+              className="btn back flex items-center gap-2"
+            >
+              <UserPlus className="w-5 h-5" /> Create New Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("landing")}
+              className="btn back flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" /> Back to Home
+            </button>
+          </div>
         </form>
       </div>
     </div>
@@ -508,21 +509,22 @@ function App() {
             {isLoading ? 'Sending...' : 'Send Reset Token'}
           </button>
           <div className="divider">OR</div>
-          <button
-            type="button"
-            onClick={() => setView("login")}
-            className="btn back flex items-center gap-2"
-            style={{ marginTop: 0 }}
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Login
-          </button>
-          <button
-            type="button"
-            onClick={() => setView("landing")}
-            className="btn back flex items-center gap-2"
-          >
-            <ArrowLeft className="w-5 h-5" /> Back to Home
-          </button>
+          <div className="button-group">
+            <button
+              type="button"
+              onClick={() => setView("login")}
+              className="btn back flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" /> Back to Login
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("landing")}
+              className="btn back flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" /> Back to Home
+            </button>
+          </div>
         </form>
       </div>
     </div>

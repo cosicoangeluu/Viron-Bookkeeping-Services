@@ -328,11 +328,10 @@ const BookkeeperDocumentView = () => {
                   </span>
                   <div style={{ marginLeft: "auto", display: "flex", gap: "0.4rem" }}>
                     <a
-                      href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
+                      href={`${API_URL}/download/${file.id}`}
                       className="download-btn"
                       title="Download file"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      download={file.fileName}
                     >
                       <Download size={14} />
                     </a>
@@ -386,14 +385,20 @@ const BookkeeperDocumentView = () => {
                         </span>
                         <div style={{ marginLeft: "auto", display: "flex", gap: "0.4rem" }}>
                           <a
-                            href={`https://bookkeeping-backend-pewk.onrender.com/api/download/${file.id}`}
+                            href={`${API_URL}/download/${file.id}`}
                             className="download-btn"
                             title="Download file"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                            download={file.fileName}
                           >
                             <Download size={14} />
                           </a>
+                          <button
+                            className="delete-btn"
+                            onClick={() => handleDelete(file.id)}
+                            title="Delete file"
+                          >
+                            <Trash2 size={14} />
+                          </button>
                         </div>
                       </div>
                     ))

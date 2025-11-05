@@ -1,3 +1,4 @@
+/* eslint-env node */
 require('dotenv').config();
 const express = require('express');
 const multer = require('multer');
@@ -15,7 +16,7 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static('uploads'));
 
-// Create uploads directory if it doesn't exist
+// Create uploads directory if it doesn't exist (for local fallback)
 if (!fs.existsSync('uploads')) {
   fs.mkdirSync('uploads');
 }
@@ -404,7 +405,7 @@ app.post('/api/signup', async (req, res) => {
         res.json({ id: result.insertId, name, email, role });
       }
     );
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Server error' });
   }
 });
@@ -1074,31 +1075,135 @@ app.get('/api/due-dates/:userId', (req, res) => {
   });
 });
 
+// Debug endpoint to check documents and files
+app.get('/api/debug/documents', (req, res) => {
+  db.query('SELECT id, user_id, file_name, file_path FROM documents LIMIT 10', [], (err, docs) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+
+    const uploadsDir = path.join(__dirname, 'uploads');
+    let filesInUploads = [];
+
+    try {
+      if (fs.existsSync(uploadsDir)) {
+        filesInUploads = fs.readdirSync(uploadsDir);
+      }
+    } catch (e) {
+      filesInUploads = ['Error reading directory: ' + e.message];
+    }
+
+    const docsWithStatus = docs.map(doc => ({
+      ...doc,
+      fileExists: fs.existsSync(path.join(__dirname, 'uploads', doc.file_path))
+    }));
+
+    res.json({
+      documents: docsWithStatus,
+      uploadsDirectory: uploadsDir,
+      filesInUploads: filesInUploads,
+      uploadsDirExists: fs.existsSync(uploadsDir)
+    });
+  });
+});
+
 // Download document
 app.get('/api/download/:documentId', (req, res) => {
   const { documentId } = req.params;
+
+  console.log('Download request for document ID:', documentId);
 
   db.query(
     'SELECT file_path, file_name FROM documents WHERE id = ?',
     [documentId],
     (err, results) => {
       if (err) {
-        return res.status(500).json({ error: err.message });
+        console.error('Database error:', err);
+        return res.status(500).json({ error: 'Database error: ' + err.message });
       }
 
       if (results.length === 0) {
-        return res.status(404).json({ error: 'Document not found' });
+        console.error('Document not found in database with ID:', documentId);
+        return res.status(404).json({ error: 'Document not found in database' });
       }
 
       const row = results[0];
-      const filePath = path.join(__dirname, 'uploads', row.file_path);
+      console.log('Found document record:', { id: documentId, file_path: row.file_path, file_name: row.file_name });
 
-      res.download(filePath, row.file_name, (err) => {
-        if (err) {
-          console.error('Error downloading file:', err);
-          res.status(500).json({ error: 'Error downloading file' });
+      const filePath = path.join(__dirname, 'uploads', row.file_path);
+      console.log('Attempting to serve file from:', filePath);
+
+      // Check if file exists
+      if (!fs.existsSync(filePath)) {
+        console.error('File not found on filesystem:', filePath);
+        console.error('Current directory:', __dirname);
+        console.error('Uploads directory exists:', fs.existsSync(path.join(__dirname, 'uploads')));
+
+        // List files in uploads directory for debugging
+        try {
+          const files = fs.readdirSync(path.join(__dirname, 'uploads'));
+          console.error('Files in uploads directory:', files);
+        } catch (e) {
+          console.error('Cannot read uploads directory:', e.message);
         }
-      });
+
+        return res.status(404).json({
+          error: 'File not found on server',
+          details: {
+            file_path: row.file_path,
+            expected_location: filePath
+          }
+        });
+      }
+
+      console.log('File exists, preparing to serve...');
+
+      // Get file extension to set proper content type
+      const ext = path.extname(row.file_name).toLowerCase();
+      const contentTypes = {
+        '.pdf': 'application/pdf',
+        '.doc': 'application/msword',
+        '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        '.xls': 'application/vnd.ms-excel',
+        '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        '.png': 'image/png',
+        '.jpg': 'image/jpeg',
+        '.jpeg': 'image/jpeg',
+        '.gif': 'image/gif'
+      };
+
+      const contentType = contentTypes[ext] || 'application/octet-stream';
+      console.log('Content type:', contentType);
+
+      if (req.query.inline === 'true') {
+        // For inline viewing, set proper content type
+        console.log('Serving file inline');
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Content-Disposition', `inline; filename="${row.file_name}"`);
+        res.sendFile(filePath, (err) => {
+          if (err) {
+            console.error('Error sending file:', err);
+            if (!res.headersSent) {
+              res.status(500).json({ error: 'Error sending file: ' + err.message });
+            }
+          } else {
+            console.log('File sent successfully');
+          }
+        });
+      } else {
+        // For download, force download
+        console.log('Serving file as download');
+        res.download(filePath, row.file_name, (err) => {
+          if (err) {
+            console.error('Error downloading file:', err);
+            if (!res.headersSent) {
+              res.status(500).json({ error: 'Error downloading file: ' + err.message });
+            }
+          } else {
+            console.log('File downloaded successfully');
+          }
+        });
+      }
     }
   );
 });
