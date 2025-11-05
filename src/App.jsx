@@ -242,19 +242,24 @@ function App() {
   const renderLogin = () => (
     <div className="landing">
       <div className="card landing-card">
-        <h1 className="title flex items-center gap-2">
-          <Shield className="w-6 h-6 text-gray-700" />
-          {userType === "client" ? "Client Login" : "Bookkeeper Login"}
-        </h1>
+        <div style={{ marginBottom: "1.75rem" }}>
+          <Shield className="w-12 h-12" style={{ color: "#8b5cf6", margin: "0 auto", display: "block", marginBottom: "0.875rem" }} />
+          <h1 className="title">
+            Welcome Back
+          </h1>
+          <p className="subtitle">
+            {userType === "client" ? "Sign in to access your financial records" : "Sign in to manage your clients"}
+          </p>
+        </div>
         <form onSubmit={handleLogin}>
           <div className="form-group">
             <label className="form-label flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Email
+              Email Address
             </label>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               required
               className="input-field"
               value={loginForm.email}
@@ -280,37 +285,39 @@ function App() {
                 className="password-toggle-btn"
                 onClick={() => setShowPasswordLogin(!showPasswordLogin)}
               >
-                {showPasswordLogin ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPasswordLogin ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
+          </div>
+          <div style={{ textAlign: "right" }}>
+            <button
+              type="button"
+              onClick={() => setView("forgot-password")}
+              className="link-btn"
+            >
+              Forgot Password?
+            </button>
           </div>
           {loginError && <div className="error-message">{loginError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Signing in...' : 'Sign In'}
           </button>
-          <button
-            type="button"
-            onClick={() => setView("forgot-password")}
-            className="btn client flex items-center gap-2"
-            style={{ marginTop: "0.75rem", backgroundColor: 'transparent', color: '#007bff', textDecoration: 'underline' }}
-          >
-            Forgot Password?
-          </button>
+          <div className="divider">OR</div>
           <button
             type="button"
             onClick={() => setView("signup")}
-            className="btn client flex items-center gap-2"
-            style={{ marginTop: "0.75rem" }}
+            className="btn back flex items-center gap-2"
+            style={{ marginTop: 0 }}
           >
-            <UserPlus className="w-5 h-5" /> Create Account
+            <UserPlus className="w-5 h-5" /> Create New Account
           </button>
           <button
             type="button"
             onClick={() => setView("landing")}
             className="btn back flex items-center gap-2"
           >
-            <ArrowLeft className="w-5 h-5" /> Back
+            <ArrowLeft className="w-5 h-5" /> Back to Home
           </button>
         </form>
       </div>
@@ -340,10 +347,15 @@ function App() {
     return (
       <div className="landing">
         <div className="card landing-card">
-          <h1 className="title flex items-center gap-2">
-            <UserPlus className="w-6 h-6 text-gray-700" />
-            {userType === "client" ? "Create Client Account" : "Create Bookkeeper Account"}
-          </h1>
+          <div style={{ marginBottom: "1.75rem" }}>
+            <UserPlus className="w-12 h-12" style={{ color: "#8b5cf6", margin: "0 auto", display: "block", marginBottom: "0.875rem" }} />
+            <h1 className="title">
+              Create Account
+            </h1>
+            <p className="subtitle">
+              {userType === "client" ? "Join us to manage your finances" : "Start managing clients professionally"}
+            </p>
+          </div>
           <form onSubmit={handleSignup}>
             <div className="form-group">
               <label className="form-label flex items-center gap-2">
@@ -352,7 +364,7 @@ function App() {
               </label>
               <input
                 type="text"
-                placeholder="Enter your full name"
+                placeholder="John Doe"
                 required
                 className="input-field"
                 value={signupForm.name}
@@ -362,11 +374,11 @@ function App() {
             <div className="form-group">
               <label className="form-label flex items-center gap-2">
                 <Mail className="w-4 h-4" />
-                Email
+                Email Address
               </label>
               <input
                 type="email"
-                placeholder="Enter your email"
+                placeholder="you@example.com"
                 required
                 className="input-field"
                 value={signupForm.email}
@@ -381,7 +393,7 @@ function App() {
               <div className="password-input-container">
                 <input
                   type={showPasswordSignup ? "text" : "password"}
-                  placeholder="Create a password"
+                  placeholder="Create a strong password"
                   required
                   className="input-field"
                   value={signupForm.password}
@@ -392,7 +404,7 @@ function App() {
                   className="password-toggle-btn"
                   onClick={() => setShowPasswordSignup(!showPasswordSignup)}
                 >
-                  {showPasswordSignup ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPasswordSignup ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
               {signupForm.password && (
@@ -431,7 +443,7 @@ function App() {
                   className="password-toggle-btn"
                   onClick={() => setShowPasswordSignup(!showPasswordSignup)}
                 >
-                  {showPasswordSignup ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPasswordSignup ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
@@ -440,12 +452,21 @@ function App() {
               {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <UserPlus className="w-5 h-5" />}
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </button>
+            <div className="divider">OR</div>
             <button
               type="button"
               onClick={() => setView("login")}
               className="btn back flex items-center gap-2"
+              style={{ marginTop: 0 }}
             >
-              <ArrowLeft className="w-5 h-5" /> Back to Login
+              <LogIn className="w-5 h-5" /> Sign In to Existing Account
+            </button>
+            <button
+              type="button"
+              onClick={() => setView("landing")}
+              className="btn back flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" /> Back to Home
             </button>
           </form>
         </div>
@@ -457,20 +478,24 @@ function App() {
   const renderForgotPassword = () => (
     <div className="landing">
       <div className="card landing-card">
-        <h1 className="title flex items-center gap-2">
-          <Shield className="w-6 h-6 text-gray-700" />
-          Forgot Password
-        </h1>
-        <p className="subtitle">Enter your email to receive a password reset token</p>
+        <div style={{ marginBottom: "1.75rem" }}>
+          <Lock className="w-12 h-12" style={{ color: "#8b5cf6", margin: "0 auto", display: "block", marginBottom: "0.875rem" }} />
+          <h1 className="title">
+            Forgot Password?
+          </h1>
+          <p className="subtitle">
+            No worries! Enter your email and we'll send you a reset token
+          </p>
+        </div>
         <form onSubmit={handleForgotPassword}>
           <div className="form-group">
             <label className="form-label flex items-center gap-2">
               <Mail className="w-4 h-4" />
-              Email
+              Email Address
             </label>
             <input
               type="email"
-              placeholder="Enter your email"
+              placeholder="you@example.com"
               required
               className="input-field"
               value={forgotForm.email}
@@ -479,15 +504,24 @@ function App() {
           </div>
           {forgotError && <div className="error-message">{forgotError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
-            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Mail className="w-5 h-5" />}
             {isLoading ? 'Sending...' : 'Send Reset Token'}
           </button>
+          <div className="divider">OR</div>
           <button
             type="button"
             onClick={() => setView("login")}
             className="btn back flex items-center gap-2"
+            style={{ marginTop: 0 }}
           >
             <ArrowLeft className="w-5 h-5" /> Back to Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("landing")}
+            className="btn back flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" /> Back to Home
           </button>
         </form>
       </div>
@@ -498,11 +532,15 @@ function App() {
   const renderResetPassword = () => (
     <div className="landing">
       <div className="card landing-card">
-        <h1 className="title flex items-center gap-2">
-          <Shield className="w-6 h-6 text-gray-700" />
-          Reset Password
-        </h1>
-        <p className="subtitle">Enter the reset token and your new password</p>
+        <div style={{ marginBottom: "1.75rem" }}>
+          <Shield className="w-12 h-12" style={{ color: "#8b5cf6", margin: "0 auto", display: "block", marginBottom: "0.875rem" }} />
+          <h1 className="title">
+            Reset Password
+          </h1>
+          <p className="subtitle">
+            Enter the reset token and create a new secure password
+          </p>
+        </div>
         <form onSubmit={handleResetPassword}>
           <div className="form-group">
             <label className="form-label flex items-center gap-2">
@@ -511,7 +549,7 @@ function App() {
             </label>
             <input
               type="text"
-              placeholder="Enter reset token"
+              placeholder="Paste your reset token here"
               required
               className="input-field"
               value={resetForm.token}
@@ -526,7 +564,7 @@ function App() {
             <div className="password-input-container">
               <input
                 type={showPasswordReset ? "text" : "password"}
-                placeholder="Enter new password"
+                placeholder="Create a new password"
                 required
                 className="input-field"
                 value={resetForm.newPassword}
@@ -537,7 +575,7 @@ function App() {
                 className="password-toggle-btn"
                 onClick={() => setShowPasswordReset(!showPasswordReset)}
               >
-                {showPasswordReset ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPasswordReset ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
@@ -549,7 +587,7 @@ function App() {
             <div className="password-input-container">
               <input
                 type={showPasswordReset ? "text" : "password"}
-                placeholder="Confirm new password"
+                placeholder="Re-enter your new password"
                 required
                 className="input-field"
                 value={resetForm.confirmPassword}
@@ -560,21 +598,30 @@ function App() {
                 className="password-toggle-btn"
                 onClick={() => setShowPasswordReset(!showPasswordReset)}
               >
-                {showPasswordReset ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                {showPasswordReset ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
               </button>
             </div>
           </div>
           {resetError && <div className="error-message">{resetError}</div>}
           <button type="submit" className="btn login flex items-center gap-2" disabled={isLoading}>
-            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <LogIn className="w-5 h-5" />}
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Shield className="w-5 h-5" />}
             {isLoading ? 'Resetting...' : 'Reset Password'}
           </button>
+          <div className="divider">OR</div>
           <button
             type="button"
             onClick={() => setView("login")}
             className="btn back flex items-center gap-2"
+            style={{ marginTop: 0 }}
           >
             <ArrowLeft className="w-5 h-5" /> Back to Login
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("landing")}
+            className="btn back flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" /> Back to Home
           </button>
         </form>
       </div>
